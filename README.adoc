@@ -1,0 +1,8 @@
+= Fabric8 Env service
+:toc:
+:toclevels: 5
+:sectnums:
+:sectnumlevels: 4
+:toc-placement: preamble
+
+Environment service takes care of managing environment.
