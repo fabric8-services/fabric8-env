@@ -6,3 +6,5 @@
 :toc-placement: preamble
 
 Environment service takes care of managing environment.
+
+NOTE: config.yaml is *not* processed by default. In order to use it, the following environment variable must be set `export F8_CONFIG_FILE_PATH="config.yaml"`
