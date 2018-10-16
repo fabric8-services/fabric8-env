@@ -215,6 +215,7 @@ CLEAN_TARGETS += clean-generated
 clean-generated:
 	-rm -rf ./app
 	-rm -rf ./swagger/
+	-rm -f ./migration/sqlbindata.go
 
 CLEAN_TARGETS += clean-vendor
 .PHONY: clean-vendor
@@ -253,10 +254,22 @@ else
 endif
 
 .PHONY: generate
-generate: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Generate GOA sources. Only necessary after clean of if changed `design` folder.
+generate: app/controllers.go migration/sqlbindata.go
+
+app/controllers.go: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Generate GOA sources. Only necessary after clean of if changed `design` folder.
 	$(GOAGEN_BIN) app -d ${PACKAGE_NAME}/${DESIGN_DIR}
 	$(GOAGEN_BIN) controller -d ${PACKAGE_NAME}/${DESIGN_DIR} -o controller/ --pkg controller --app-pkg ${PACKAGE_NAME}/app
 	$(GOAGEN_BIN) gen -d ${PACKAGE_NAME}/${DESIGN_DIR} --pkg-path=github.com/fabric8-services/fabric8-common/goasupport/status --out app
 	$(GOAGEN_BIN) gen -d ${PACKAGE_NAME}/${DESIGN_DIR} --pkg-path=github.com/fabric8-services/fabric8-common/goasupport/jsonapi_errors_helpers --out app
 	$(GOAGEN_BIN) swagger -d ${PACKAGE_NAME}/${DESIGN_DIR}
-	
+
+migration/sqlbindata.go: $(GO_BINDATA_BIN) $(wildcard migration/sql-files/*.sql)
+	$(GO_BINDATA_BIN) \
+		-o migration/sqlbindata.go \
+		-pkg migration \
+		-prefix migration/sql-files \
+		-nocompress \
+		migration/sql-files
+
+$(GO_BINDATA_BIN): $(VENDOR_DIR)
+	cd $(VENDOR_DIR)/github.com/jteeuwen/go-bindata/go-bindata && go build -v

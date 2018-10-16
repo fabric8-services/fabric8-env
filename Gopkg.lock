@@ -50,16 +50,37 @@
   version = "v5.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/fabric8-services/fabric8-auth"
+  packages = [
+    "errors",
+    "log",
+    "rest",
+    "token/jwk"
+  ]
+  revision = "9af23465f289dd7a3f9ffc4c6df7a4c0469617da"
+
+[[projects]]
+  branch = "nt_db"
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
+    "closeable",
     "configuration",
+    "convert",
+    "convert/ptr",
+    "errors",
     "goasupport/jsonapi_errors_helpers",
     "goasupport/status",
+    "gormsupport",
     "log",
+    "login/tokencontext",
     "metric",
-    "sentry"
+    "migration",
+    "sentry",
+    "token"
   ]
-  revision = "51e44b47e514721ddaa3fca99e5fb5bc1a6e7eb2"
+  revision = "9720c2fdf34e8328f5038b2e751b6139ab12cc59"
+  source = "github.com/nurali-techie/fabric8-common"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -177,10 +198,39 @@
   version = "v1.0"
 
 [[projects]]
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
+  name = "github.com/jteeuwen/go-bindata"
+  packages = [
+    ".",
+    "go-bindata"
+  ]
+  revision = "v3.0.7"
+
+[[projects]]
   branch = "master"
   name = "github.com/kardianos/osext"
   packages = ["."]
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
+
+[[projects]]
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/magiconair/properties"
@@ -274,7 +324,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+  revision = "bcb74de08d37a417cb6789eec1d6c810040f0470"
 
 [[projects]]
   branch = "master"
@@ -352,6 +402,16 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "pbkdf2"
+  ]
+  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = ["websocket"]
   revision = "49bb7cea24b1df9410e1712aa6433dae904ff66a"
@@ -384,7 +444,17 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "d3c6139142f2181b42a21db02903fafea6215674"
+  revision = "5d4988d199e2aeefda3528f599e06410c43caa29"
+
+[[projects]]
+  name = "gopkg.in/square/go-jose.v2"
+  packages = [
+    ".",
+    "cipher",
+    "json"
+  ]
+  revision = "ef984e69dd356202fd4e4910d4d9c24468bdf0b8"
+  version = "v2.1.9"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -395,6 +465,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1e5fb181fbd15bdebdb62b389556f18c5a039f540a80093a718b57f4375d877c"
+  inputs-digest = "c4201a2a1bca252321ce5347bb8868e7f4f735047df200591ea215fe455bdde5"
   solver-name = "gps-cdcl"
   solver-version = 1
