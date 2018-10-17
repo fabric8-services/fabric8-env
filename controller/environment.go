@@ -3,9 +3,9 @@ package controller
 import (
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-env/app"
+	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
 	"github.com/goadesign/goa"
-	"github.com/jinzhu/gorm"
 	errs "github.com/pkg/errors"
 )
 
@@ -15,17 +15,17 @@ const (
 
 type EnvironmentController struct {
 	*goa.Controller
-	db *gorm.DB
+	db application.DB
 }
 
-func NewEnvironmentController(service *goa.Service, db *gorm.DB) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB) *EnvironmentController {
 	return &EnvironmentController{
 		Controller: service.NewController("EnvironmentController"),
 		db:         db,
 	}
 }
 
-func ConvertEnvironment(env environment.Environment) *app.Environment {
+func ConvertEnvironment(env *environment.Environment) *app.Environment {
 	respEnv := &app.Environment{
 		ID:   env.ID,
 		Type: APIStringTypeEnvironment,
@@ -42,7 +42,7 @@ func ConvertEnvironment(env environment.Environment) *app.Environment {
 	return respEnv
 }
 
-func ConvertEnvironments(envs []environment.Environment) *app.EnvironmentsList {
+func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList {
 	res := &app.EnvironmentsList{Data: make([]*app.Environment, len(envs), len(envs))}
 	for ind, env := range envs {
 		res.Data[ind] = ConvertEnvironment(env)
@@ -62,19 +62,27 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
 	}
 
-	newEnv := environment.Environment{
-		Name:          reqEnv.Attributes.Name,
-		Type:          reqEnv.Attributes.Type,
-		NamespaceName: reqEnv.Attributes.NamespaceName,
-		ClusterURL:    reqEnv.Attributes.ClusterURL,
-	}
+	var err error
+	var env *environment.Environment
+	err = application.Transactional(c.db, func(appl application.Application) error {
+		newEnv := environment.Environment{
+			Name:          reqEnv.Attributes.Name,
+			Type:          reqEnv.Attributes.Type,
+			NamespaceName: reqEnv.Attributes.NamespaceName,
+			ClusterURL:    reqEnv.Attributes.ClusterURL,
+		}
 
-	env, err := environment.NewRepository(c.db).Create(ctx, &newEnv)
+		env, err = appl.Environments().Create(ctx, &newEnv)
+		if err != nil {
+			return errs.Wrapf(err, "failed to create space: %s", newEnv.Name)
+		}
+		return nil
+	})
 	if err != nil {
-		return errs.Wrapf(err, "failed to create space: %s", newEnv.Name)
+		return app.JSONErrorResponse(ctx, err)
 	}
 
-	envData := ConvertEnvironment(*env)
+	envData := ConvertEnvironment(env)
 	res := &app.EnvironmentSingle{
 		Data: envData,
 	}
@@ -84,7 +92,12 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 }
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
-	envs, err := environment.NewRepository(c.db).List(ctx)
+	var err error
+	var envs []*environment.Environment
+	err = application.Transactional(c.db, func(appl application.Application) error {
+		envs, err = appl.Environments().List(ctx)
+		return err
+	})
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}

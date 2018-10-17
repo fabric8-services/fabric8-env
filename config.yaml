@@ -1,25 +1,20 @@
-#------------------------
-# Postgres configuration
-#------------------------
+# General
+developer.mode.enabled: false
+log.level: info
 
+# Postgres
 postgres.host: localhost
 postgres.port: 5432
 postgres.user: postgres
 postgres.password: mysecretpassword
 postgres.database: postgres
 postgres.sslmode: disable
-# The amount of time before the connection times out
 postgres.connection.timeout: 5
-# Duration to wait before trying to connect again
 postgres.connection.retrysleep: 1s
 postgres.connection.maxidle: -1
 postgres.connection.maxopen: -1
-# Timeout for a transaction in minutes 
 postgres.transaction.timeout: 5m
 
-developer.mode.enabled: false
-log.level: info
-
-# Auth service URL
+# Auth service
 auth.url : https://auth.prod-preview.openshift.io
 auth.keys.token.path : /api/token/keys

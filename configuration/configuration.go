@@ -47,6 +47,7 @@ const (
 	varPostgresConnectionRetrySleep = "postgres.connection.retrysleep"
 	varPostgresConnectionMaxIdle    = "postgres.connection.maxidle"
 	varPostgresConnectionMaxOpen    = "postgres.connection.maxopen"
+	varPostgresTransactionTimeout   = "postgres.transaction.timeout"
 
 	defaultLogLevel = "info"
 )
@@ -96,6 +97,8 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varHTTPAddress, "0.0.0.0:8080")
 	c.v.SetDefault(varMetricsHTTPAddress, "0.0.0.0:8080")
 	c.v.SetDefault(varDeveloperModeEnabled, false)
+
+	c.v.SetDefault(varPostgresTransactionTimeout, time.Duration(5*time.Minute))
 }
 
 func (c *Registry) GetLogLevel() string {
@@ -206,4 +209,8 @@ func (c *Registry) GetPostgresConnectionMaxOpen() int {
 
 func (c *Registry) GetSentryDSN() string {
 	return c.v.GetString(varSentryDSN)
+}
+
+func (c *Registry) GetPostgresTransactionTimeout() time.Duration {
+	return c.v.GetDuration(varPostgresTransactionTimeout)
 }

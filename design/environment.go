@@ -71,6 +71,7 @@ var _ = a.Resource("environment", func() {
 			a.GET(""),
 		)
 		a.Description("List environments.")
+		// TODO required ??
 		// a.Params(func() {
 		// 	a.Param("page[offset]", d.String, "Paging start position")
 		// 	a.Param("page[limit]", d.Integer, "Paging size")

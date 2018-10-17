@@ -16,8 +16,10 @@ import (
 	"github.com/fabric8-services/fabric8-common/sentry"
 	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
+	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
+	"github.com/fabric8-services/fabric8-env/gormapp"
 	"github.com/fabric8-services/fabric8-env/migration"
 	"github.com/goadesign/goa"
 	goalogrus "github.com/goadesign/goa/logging/logrus"
@@ -94,10 +96,12 @@ func main() {
 	app.UseJWTMiddleware(service, jwt.New(tokenMgr.PublicKeys(), nil, app.NewJWTSecurity()))
 	service.Use(metric.Recorder("fabric8_env"))
 
+	appDB := gormapp.NewGormDB(db)
+
 	// Mount controllers
 	statusCtrl := controller.NewStatusController(service)
 	app.MountStatusController(service, statusCtrl)
-	envCtrl := controller.NewEnvironmentController(service, db)
+	envCtrl := controller.NewEnvironmentController(service, appDB)
 	app.MountEnvironmentController(service, envCtrl)
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)
@@ -197,6 +201,7 @@ func setupDB(db *gorm.DB, config *configuration.Registry) {
 		db.DB().SetMaxOpenConns(config.GetPostgresConnectionMaxOpen())
 		log.Logger().Infof("Configured connection pool max open %v", config.GetPostgresConnectionMaxOpen())
 	}
+	application.SetDatabaseTransactionTimeout(config.GetPostgresTransactionTimeout())
 }
 
 func getTokenManager(config *configuration.Registry) token.Manager {

@@ -20,7 +20,7 @@ type Environment struct {
 
 type Repository interface {
 	Create(ctx context.Context, env *Environment) (*Environment, error)
-	List(ctx context.Context) ([]Environment, error)
+	List(ctx context.Context) ([]*Environment, error)
 }
 
 type GormRepository struct {
@@ -38,8 +38,8 @@ func (r *GormRepository) Create(ctx context.Context, env *Environment) (*Environ
 	return env, nil
 }
 
-func (r *GormRepository) List(ctx context.Context) ([]Environment, error) {
-	var rows []Environment
+func (r *GormRepository) List(ctx context.Context) ([]*Environment, error) {
+	var rows []*Environment
 	err := r.db.Model(&Environment{}).Find(&rows).Error
 	if err != nil {
 		return nil, errs.WithStack(err)
