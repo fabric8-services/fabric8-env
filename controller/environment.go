@@ -51,12 +51,6 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 }
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
-	// TODO use from f8-common
-	// _, err := token.ContextIdentity(ctx)
-	// if err != nil {
-	// 	return app.JSONErrorResponse(ctx, goa.ErrUnauthorized(err.Error()))
-	// }
-
 	reqEnv := ctx.Payload.Data
 	if reqEnv == nil {
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))

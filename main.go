@@ -11,6 +11,7 @@ import (
 
 	"github.com/fabric8-services/fabric8-common/closeable"
 	"github.com/fabric8-services/fabric8-common/convert/ptr"
+	"github.com/fabric8-services/fabric8-common/goamiddleware"
 	"github.com/fabric8-services/fabric8-common/log"
 	"github.com/fabric8-services/fabric8-common/metric"
 	"github.com/fabric8-services/fabric8-common/sentry"
@@ -88,13 +89,18 @@ func main() {
 	service.Use(gzip.Middleware(9))
 	service.Use(app.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
+
 	service.WithLogger(goalogrus.New(log.Logger()))
+
 	tokenMgr := getTokenManager(config)
-	// TODO add token_cotext_middleware once available in f8-common
+	tokenCtxMW := goamiddleware.TokenContext(tokenMgr.PublicKeys(), nil, app.NewJWTSecurity())
+	service.Use(tokenCtxMW)
 	service.Use(token.InjectTokenManager(tokenMgr))
+
 	service.Use(log.LogRequest(config.DeveloperModeEnabled()))
 	app.UseJWTMiddleware(service, jwt.New(tokenMgr.PublicKeys(), nil, app.NewJWTSecurity()))
 	service.Use(metric.Recorder("fabric8_env"))
+	// ---
 
 	appDB := gormapp.NewGormDB(db)
 
@@ -103,6 +109,7 @@ func main() {
 	app.MountStatusController(service, statusCtrl)
 	envCtrl := controller.NewEnvironmentController(service, appDB)
 	app.MountEnvironmentController(service, envCtrl)
+	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)
 	log.Logger().Infoln("UTC Build Time: ", app.BuildTime)

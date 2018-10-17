@@ -17,4 +17,4 @@ postgres.transaction.timeout: 5m
 
 # Auth service
 auth.url : https://auth.prod-preview.openshift.io
-auth.keys.token.path : /api/token/keys
+auth.keys.path : /api/token/keys

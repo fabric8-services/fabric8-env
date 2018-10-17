@@ -50,17 +50,6 @@
   version = "v5.0.1"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/fabric8-services/fabric8-auth"
-  packages = [
-    "errors",
-    "log",
-    "rest",
-    "token/jwk"
-  ]
-  revision = "9af23465f289dd7a3f9ffc4c6df7a4c0469617da"
-
-[[projects]]
   branch = "nt_db"
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
@@ -69,17 +58,20 @@
     "convert",
     "convert/ptr",
     "errors",
+    "goamiddleware",
     "goasupport/jsonapi_errors_helpers",
     "goasupport/status",
     "gormsupport",
+    "httpsupport",
     "log",
-    "login/tokencontext",
     "metric",
     "migration",
     "sentry",
-    "token"
+    "token",
+    "token/jwk",
+    "token/tokencontext"
   ]
-  revision = "9720c2fdf34e8328f5038b2e751b6139ab12cc59"
+  revision = "5d0d2b45fd6681e817f7c56ff5d29e1952df90d4"
   source = "github.com/nurali-techie/fabric8-common"
 
 [[projects]]
@@ -444,7 +436,7 @@
     "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "5d4988d199e2aeefda3528f599e06410c43caa29"
+  revision = "5ef16f43e633c268c7c28abdba1a0173a4d715b8"
 
 [[projects]]
   name = "gopkg.in/square/go-jose.v2"
@@ -465,6 +457,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c4201a2a1bca252321ce5347bb8868e7f4f735047df200591ea215fe455bdde5"
+  inputs-digest = "ccc90bcfd340f9bb8771fdedc81367d7226806cb378fb35de4a592187b957b3f"
   solver-name = "gps-cdcl"
   solver-version = 1
