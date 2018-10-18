@@ -131,8 +131,8 @@ ifeq ($(UNAME_S),Darwin)
 else
 	@curl -L -s https://github.com/golang/dep/releases/download/$(DEP_VERSION)/dep-linux-amd64 -o $(DEP_BIN)
 	@cd $(DEP_BIN_DIR) && \
-	echo "31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315  dep" > dep-linux-amd64.sha256 && \
-	sha256sum -c dep-linux-amd64.sha256
+	echo "31144e465e52ffbc0035248a10ddea61a09bf28b00784fd3fdd9882c8cbb2315  dep" > checksum && \
+	sha256sum -c checksum
 endif
 	@chmod +x $(DEP_BIN)
 
@@ -248,13 +248,22 @@ endif
 # build the binary executable (to ship in prod)
 LDFLAGS=-ldflags "-X ${PACKAGE_NAME}/app.Commit=${COMMIT} -X ${PACKAGE_NAME}/app.BuildTime=${BUILD_TIME}"
 
+# TODO add BINARY_CLIENT_BIN
 .PHONY: build
-build: prebuild-check deps generate ## Build the server
+build: prebuild-check deps generate $(BINARY_SERVER_BIN)
+
+$(BINARY_SERVER_BIN): $(SOURCES)
 ifeq ($(OS),Windows_NT)
 	go build -v $(LDFLAGS) -o "$(shell cygpath --windows '$(BINARY_SERVER_BIN)')"
 else
 	go build -v $(LDFLAGS) -o $(BINARY_SERVER_BIN)
 endif
+
+
+.PHONY: migrate-database
+## Compiles the server and runs the database migration with it
+migrate-database: $(BINARY_SERVER_BIN)
+	$(BINARY_SERVER_BIN) -migrateDatabase
 
 
 .PHONY: generate
