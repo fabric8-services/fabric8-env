@@ -49,6 +49,7 @@ ifneq ($(GITUNTRACKEDCHANGES),)
 	COMMIT := $(COMMIT)-dirty
 endif
 BUILD_TIME=`date -u '+%Y-%m-%dT%H:%M:%SZ'`
+BUILD_DIR = bin
 
 .DEFAULT_GOAL := help
 
@@ -65,21 +66,6 @@ endef
 .PHONY: help
 help: ## Prints this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
-
-
-# Docker build
-BUILD_DIR = bin
-REGISTRY_URI = quay.io
-REGISTRY_NS = ${PROJECT_NAME}
-REGISTRY_IMAGE = ${PROJECT_NAME}
-
-ifeq ($(TARGET),rhel)
-	REGISTRY_URL := ${REGISTRY_URI}/openshiftio/rhel-${REGISTRY_NS}-${REGISTRY_IMAGE}
-	DOCKERFILE := Dockerfile.rhel
-else
-	REGISTRY_URL := ${REGISTRY_URI}/openshiftio/${REGISTRY_NS}-${REGISTRY_IMAGE}
-	DOCKERFILE := Dockerfile
-endif
 
 
 $(BUILD_DIR):
@@ -101,6 +87,7 @@ $(INSTALL_PREFIX):
 $(TMP_PATH):
 	mkdir -p $(TMP_PATH)
 
+# TODO add CHECK_GOPATH_BIN
 .PHONY: prebuild-check
 prebuild-check: $(TMP_PATH) $(INSTALL_PREFIX) 
 # Check that all tools where found
