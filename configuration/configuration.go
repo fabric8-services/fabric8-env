@@ -48,8 +48,11 @@ const (
 	varPostgresConnectionMaxIdle    = "postgres.connection.maxidle"
 	varPostgresConnectionMaxOpen    = "postgres.connection.maxopen"
 	varPostgresTransactionTimeout   = "postgres.transaction.timeout"
+)
 
-	defaultLogLevel = "info"
+const (
+	defaultLogLevel   = "info"
+	defaultDBPassword = "mysecretpassword"
 )
 
 // DevModePrivateKey the private key used to sign some tokens
@@ -128,6 +131,17 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varMetricsHTTPAddress, "0.0.0.0:8080")
 	c.v.SetDefault(varDeveloperModeEnabled, false)
 
+	// db
+	c.v.SetDefault(varPostgresHost, "localhost")
+	c.v.SetDefault(varPostgresPort, 5432)
+	c.v.SetDefault(varPostgresUser, "postgres")
+	c.v.SetDefault(varPostgresDatabase, "postgres")
+	c.v.SetDefault(varPostgresPassword, defaultDBPassword)
+	c.v.SetDefault(varPostgresSSLMode, "disable")
+	c.v.SetDefault(varPostgresConnectionTimeout, 5)
+	c.v.SetDefault(varPostgresConnectionMaxIdle, -1)
+	c.v.SetDefault(varPostgresConnectionMaxOpen, -1)
+	c.v.SetDefault(varPostgresConnectionRetrySleep, time.Duration(time.Second))
 	c.v.SetDefault(varPostgresTransactionTimeout, time.Duration(5*time.Minute))
 }
 

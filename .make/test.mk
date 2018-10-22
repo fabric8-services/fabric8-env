@@ -188,15 +188,15 @@ test-migration: prebuild-check migration/sqlbindata.go migration/sqlbindata_test
 	F8_RESOURCE_DATABASE=1 F8_LOG_LEVEL=$(F8_LOG_LEVEL) go test $(GO_TEST_VERBOSITY_FLAG) github.com/fabric8-services/fabric8-wit/migration
 
 # Starts the WIT server and waits until its running
-define start-wit
-	echo "Starting WIT and ensuring that it is running..."; \
-	F8_LOG_LEVEL=ERROR ./wit+pmcd.sh & 
-	while ! nc -z localhost 8080 < /dev/null; do \
-		printf .; \
-		sleep 5 ; \
-	done; \
-	echo "WIT is RUNNING!";
-endef
+# define start-wit
+# 	echo "Starting WIT and ensuring that it is running..."; \
+# 	F8_LOG_LEVEL=ERROR ./wit+pmcd.sh & 
+# 	while ! nc -z localhost 8080 < /dev/null; do \
+# 		printf .; \
+# 		sleep 5 ; \
+# 	done; \
+# 	echo "WIT is RUNNING!";
+# endef
 
 # Downloads docker-compose to tmp/docker-compose if it does not already exist.
 define download-docker-compose
