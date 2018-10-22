@@ -143,6 +143,9 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varPostgresConnectionMaxOpen, -1)
 	c.v.SetDefault(varPostgresConnectionRetrySleep, time.Duration(time.Second))
 	c.v.SetDefault(varPostgresTransactionTimeout, time.Duration(5*time.Minute))
+
+	// others
+	c.v.SetDefault(varAuthKeysPath, "/api/token/keys")
 }
 
 func (c *Registry) GetLogLevel() string {
