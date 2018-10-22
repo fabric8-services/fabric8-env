@@ -43,6 +43,7 @@ required = [
   "github.com/golang/lint/golint",
   "github.com/fzipp/gocyclo",
   "github.com/pilu/fresh", # used to rebuild if source changed while running
+  "github.com/wadey/gocovmerge",
 ]
 
 ignored = [
