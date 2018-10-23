@@ -1,12 +1,12 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: env
+  name: f8env
 objects:
 - apiVersion: v1
   kind: Secret
   metadata:
-    name: env
+    name: f8env
   type: Opaque
   data:
     db.host: ZGI=
@@ -17,7 +17,7 @@ objects:
 - apiVersion: v1
   kind: ConfigMap
   metadata:
-    name: env
+    name: f8env
   type: Opaque
   data:
     postgres.sslmode: require
