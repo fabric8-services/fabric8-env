@@ -1,18 +1,18 @@
 kind: Template
 apiVersion: v1
 metadata:
-  name: env
+  name: f8env
 objects:
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
     labels:
-      service: env
-    name: env
+      service: f8env
+    name: f8env
   spec:
     replicas: ${{REPLICAS}}
     selector:
-      service: env
+      service: f8env
     strategy:
       rollingParams:
         intervalSeconds: 1
@@ -24,7 +24,7 @@ objects:
     template:
       metadata:
         labels:
-          service: env
+          service: f8env
       spec:
         containers:
         - image: ${IMAGE}:${IMAGE_TAG}
@@ -32,55 +32,55 @@ objects:
           - name: F8_POSTGRES_HOST
             valueFrom:
               secretKeyRef:
-                name: env
+                name: f8env
                 key: db.host
           - name: F8_POSTGRES_PORT
             valueFrom:
               secretKeyRef:
-                name: env
+                name: f8env
                 key: db.port
           - name: F8_POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: env
+                name: f8env
                 key: db.user
           - name: F8_POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: env
+                name: f8env
                 key: db.password
           - name: F8_SENTRY_DSN
             valueFrom:
               secretKeyRef:
-                name: env
+                name: f8env
                 key: sentry.dsn
           - name: F8_POSTGRES_SSLMODE
             valueFrom:
               configMapKeyRef:
-                name: env
+                name: f8env
                 key: postgres.sslmode
           - name: F8_POSTGRES_CONNECTION_MAXIDLE
             valueFrom:
               configMapKeyRef:
-                name: env
+                name: f8env
                 key: postgres.connection.maxidle
           - name: F8_POSTGRES_CONNECTION_MAXOPEN
             valueFrom:
               configMapKeyRef:
-                name: env
+                name: f8env
                 key: postgres.connection.maxopen
           - name: F8_ENVIRONMENT
             valueFrom:
               configMapKeyRef:
-                name: env
+                name: f8env
                 key: environment
           - name: F8_AUTH_URL
             valueFrom:
               configMapKeyRef:
-                name: env
+                name: f8env
                 key: auth.url
           imagePullPolicy: Always
-          name: env
+          name: f8env
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -126,9 +126,9 @@ objects:
 - kind: Service
   apiVersion: v1
   metadata:
-    name: env
+    name: f8env
     labels:
-      service: env
+      service: f8env
   spec:
     ports:
       - name: "8080"
@@ -136,7 +136,7 @@ objects:
         port: 80
         targetPort: 8080
     selector:
-      service: env
+      service: f8env
     type: ClusterIP
     sessionAffinity: null
 parameters:
