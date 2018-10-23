@@ -35,8 +35,6 @@ ignored = [
   name = "github.com/jteeuwen/go-bindata"
   revision = "v3.0.7"
 
-# TODO: use revision
 [[constraint]]
   name = "github.com/fabric8-services/fabric8-common"
-  source = "github.com/nurali-techie/fabric8-common"
-  branch = "nt_db"
+  revision = "0f3bea9c1397f4342ce64fbcfad9a67f373861ea"
