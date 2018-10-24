@@ -1,4 +1,4 @@
-BINARY_SERVER_BIN=$(INSTALL_PREFIX)/fabric8-env
+BINARY_SERVER_BIN=$(INSTALL_PREFIX)/env
 GOAGEN_BIN=$(VENDOR_DIR)/github.com/goadesign/goa/goagen/goagen
 GO_BINDATA_DIR=$(VENDOR_DIR)/github.com/jteeuwen/go-bindata/go-bindata/
 GO_BINDATA_BIN=$(GO_BINDATA_DIR)/go-bindata
@@ -15,3 +15,4 @@ GO_BIN_NAME:=go
 DEP_BIN_NAME:=dep
 CHECK_GOPATH_BIN:=$(INSTALL_PREFIX)/check_gopath
 UNAME_S:=$(shell uname -s)
+DOCKER_BIN_NAME := docker
