@@ -54,10 +54,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	if migrateDB {
-		os.Exit(0)
-	}
-
 	// Initialized developer mode flag and log level for the logger
 	log.InitializeLogger(config.IsLogJSON(), config.GetLogLevel())
 

@@ -254,7 +254,7 @@ migrate-database: $(BINARY_SERVER_BIN)
 
 
 .PHONY: generate
-generate: app/controllers.go migration/sqlbindata.go
+generate: app/controllers.go migration/sqlbindata.go migration/sqlbindata_test.go
 
 app/controllers.go: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Generate GOA sources. Only necessary after clean of if changed `design` folder.
 	$(GOAGEN_BIN) app -d ${PACKAGE_NAME}/${DESIGN_DIR}
@@ -263,13 +263,21 @@ app/controllers.go: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Gen
 	$(GOAGEN_BIN) gen -d ${PACKAGE_NAME}/${DESIGN_DIR} --pkg-path=github.com/fabric8-services/fabric8-common/goasupport/jsonapi_errors_helpers --out app
 	$(GOAGEN_BIN) swagger -d ${PACKAGE_NAME}/${DESIGN_DIR}
 
-migration/sqlbindata.go: $(GO_BINDATA_BIN) $(wildcard migration/sql-files/*.sql)
+migration/sqlbindata.go: $(GO_BINDATA_BIN)
 	$(GO_BINDATA_BIN) \
 		-o migration/sqlbindata.go \
 		-pkg migration \
 		-prefix migration/sql-files \
 		-nocompress \
 		migration/sql-files
+
+migration/sqlbindata_test.go: $(GO_BINDATA_BIN)
+	$(GO_BINDATA_BIN) \
+		-o migration/sqlbindata_test.go \
+		-pkg migration_test \
+		-prefix migration/sql-test-files \
+		-nocompress \
+		migration/sql-test-files
 
 $(GO_BINDATA_BIN): $(VENDOR_DIR)
 	cd $(VENDOR_DIR)/github.com/jteeuwen/go-bindata/go-bindata && go build -v
