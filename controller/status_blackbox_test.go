@@ -1,4 +1,4 @@
-package controller
+package controller_test
 
 import (
 	"context"
@@ -7,13 +7,14 @@ import (
 
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/app/test"
+	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/goadesign/goa"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestShowStatus(t *testing.T) {
 	service := goa.New("status-test")
-	ctrl := NewStatusController(service)
+	ctrl := controller.NewStatusController(service)
 
 	_, res := test.ShowStatusOK(t, context.Background(), service, ctrl)
 

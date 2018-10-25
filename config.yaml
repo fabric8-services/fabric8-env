@@ -4,7 +4,7 @@ log.level: info
 
 # Postgres
 postgres.host: localhost
-postgres.port: 5432
+postgres.port: 5436
 postgres.user: postgres
 postgres.password: mysecretpassword
 postgres.database: postgres

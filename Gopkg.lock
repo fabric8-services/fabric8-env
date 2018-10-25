@@ -65,12 +65,13 @@
     "log",
     "metric",
     "migration",
+    "resource",
     "sentry",
+    "test/suite",
     "token",
-    "token/jwk",
-    "token/tokencontext"
+    "token/jwk"
   ]
-  revision = "7a49685a8135c385898dff8f46277a508eaf6cc5"
+  revision = "2b6ded8f8650db8c287d40ad49a3ac2edcaf9afb"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -380,7 +381,11 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert"]
+  packages = [
+    "assert",
+    "require",
+    "suite"
+  ]
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
 
@@ -462,6 +467,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b963ef1f6314c455225ecca7a9c1912095c6dc023cae65471b693351390b13c1"
+  inputs-digest = "bf3955f441b6c3f376e3705c0e489f99297fc676f7bec6feda559f1984ea1182"
   solver-name = "gps-cdcl"
   solver-version = 1
