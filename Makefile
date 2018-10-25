@@ -200,6 +200,7 @@ clean-generated:
 	-rm -rf ./app
 	-rm -rf ./swagger/
 	-rm -f ./migration/sqlbindata.go
+	-rm -f ./migration/sqlbindata_test.go
 
 CLEAN_TARGETS += clean-vendor
 .PHONY: clean-vendor
