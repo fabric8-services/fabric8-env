@@ -50,7 +50,6 @@
   version = "v5.0.1"
 
 [[projects]]
-  branch = "nt_db"
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
     "closeable",
@@ -71,8 +70,7 @@
     "token/jwk",
     "token/tokencontext"
   ]
-  revision = "5d0d2b45fd6681e817f7c56ff5d29e1952df90d4"
-  source = "github.com/nurali-techie/fabric8-common"
+  revision = "7a49685a8135c385898dff8f46277a508eaf6cc5"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -464,6 +462,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "55e02119e112f1f4b890cbfd8809adc64f5cda87f12650c3239abc160238fbda"
+  inputs-digest = "b963ef1f6314c455225ecca7a9c1912095c6dc023cae65471b693351390b13c1"
   solver-name = "gps-cdcl"
   solver-version = 1

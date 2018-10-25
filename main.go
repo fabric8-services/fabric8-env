@@ -97,7 +97,7 @@ func main() {
 	service.WithLogger(goalogrus.New(log.Logger()))
 
 	tokenMgr := getTokenManager(config)
-	tokenCtxMW := goamiddleware.TokenContext(tokenMgr.PublicKeys(), nil, app.NewJWTSecurity())
+	tokenCtxMW := goamiddleware.TokenContext(tokenMgr, app.NewJWTSecurity())
 	service.Use(tokenCtxMW)
 	service.Use(token.InjectTokenManager(tokenMgr))
 
