@@ -43,19 +43,19 @@ func Transactional(db DB, todo func(f Application) error) error {
 		case err := <-errorChan:
 			if err != nil {
 				log.Debug(nil, map[string]interface{}{"error": err}, "Rolling back the transaction...")
-				tx.Rollback()
+				_ = tx.Rollback()
 				log.Error(nil, map[string]interface{}{
 					"err": err,
 				}, "database transaction failed!")
 				return errors.WithStack(err)
 			}
-			tx.Commit()
+			_ = tx.Commit()
 			log.Debug(nil, nil, "Commit the transaction!")
 			return nil
 
 		case <-txTimeout:
 			log.Debug(nil, nil, "Rolling back the transaction...")
-			tx.Rollback()
+			_ = tx.Rollback()
 			log.Error(nil, nil, "database transaction timeout!")
 			return errors.New("database transaction timeout")
 		}
