@@ -13,7 +13,6 @@ COPY ./env+pmcd.sh /env+pmcd.sh
 EXPOSE 44321
 
 COPY bin/env ${F8_INSTALL_PREFIX}/bin/env
-COPY config.yaml ${F8_INSTALL_PREFIX}/etc/config.yaml
 
 # From here onwards, any RUN, CMD, or ENTRYPOINT will be run under the following user
 USER ${F8_USER_NAME}
