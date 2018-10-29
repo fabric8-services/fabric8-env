@@ -1,7 +1,10 @@
 package migration
 
-import "database/sql"
-import "github.com/fabric8-services/fabric8-common/migration"
+import (
+	"database/sql"
+
+	"github.com/fabric8-services/fabric8-common/migration"
+)
 
 func Migrate(db *sql.DB, catalog string) error {
 	return migration.Migrate(db, catalog, Steps())

@@ -20,6 +20,9 @@ import (
 
 type EnvironmentControllerSuite struct {
 	testsuite.DBTestSuite
+	service *goa.Service
+	db      *gormapp.GormDB
+	ctrl    *controller.EnvironmentController
 }
 
 func TestEnvironmentController(t *testing.T) {
@@ -29,28 +32,27 @@ func TestEnvironmentController(t *testing.T) {
 	suite.Run(t, &EnvironmentControllerSuite{DBTestSuite: testsuite.NewDBTestSuite(config)})
 }
 
-func (s *EnvironmentControllerSuite) TestCreateEnvironment() {
-	service := goa.New("enviroment-test")
-	appDB := gormapp.NewGormDB(s.DB)
-	ctrl := controller.NewEnvironmentController(service, appDB)
+func (s *EnvironmentControllerSuite) SetupSuite() {
+	s.DBTestSuite.SetupSuite()
 
+	s.service = goa.New("enviroment-test")
+	s.db = gormapp.NewGormDB(s.DB)
+	s.ctrl = controller.NewEnvironmentController(s.service, s.db)
+}
+func (s *EnvironmentControllerSuite) TestCreateEnvironment() {
 	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
 	require.NoError(s.T(), err)
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, spaceID, payload)
+	test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
 }
 
 func (s *EnvironmentControllerSuite) TestListEnvironment() {
-	service := goa.New("enviroment-test")
-	appDB := gormapp.NewGormDB(s.DB)
-	ctrl := controller.NewEnvironmentController(service, appDB)
-
 	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
 	require.NoError(s.T(), err)
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, spaceID, payload)
+	test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
 
-	_, list := test.ListEnvironmentOK(s.T(), context.Background(), service, ctrl, spaceID, nil, nil)
+	_, list := test.ListEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID)
 	require.NotNil(s.T(), list)
 	require.NotEmpty(s.T(), list.Data)
 }

@@ -36,12 +36,6 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	a.Attribute("cluster-url", d.String, "The cluster url", func() {
 		a.Example("https://api.starter-us-east-2a.openshift.com")
 	})
-	a.Attribute("created-at", d.DateTime, "When the environment was created", func() {
-		a.Example("2016-11-29T23:18:14Z")
-	})
-	a.Attribute("updated-at", d.DateTime, "When the environment was updated", func() {
-		a.Example("2016-11-29T23:18:14Z")
-	})
 })
 
 // var envRelationships = a.Type("EnvironmentRelations", func() {
@@ -77,15 +71,7 @@ var _ = a.Resource("environment", func() {
 		a.Params(func() {
 			a.Param("spaceID", d.UUID, "ID of the space")
 		})
-		// TODO required ??
-		// a.Params(func() {
-		// 	a.Param("page[offset]", d.String, "Paging start position")
-		// 	a.Param("page[limit]", d.Integer, "Paging size")
-		// })
-		a.UseTrait("conditional")
-		a.Response(d.OK, func() {
-			a.Media(envList)
-		})
+		a.Response(d.OK, envList)
 		a.Response(d.NotModified)
 		a.Response(d.BadRequest, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)
@@ -102,9 +88,7 @@ var _ = a.Resource("environment", func() {
 			a.Param("spaceID", d.UUID, "ID of the space")
 		})
 		a.Payload(envSingle)
-		a.Response(d.Created, "/environments/.*", func() {
-			a.Media(envSingle)
-		})
+		a.Response(d.Created, envSingle)
 		a.Response(d.BadRequest, JSONAPIErrors)
 		a.Response(d.NotFound, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)

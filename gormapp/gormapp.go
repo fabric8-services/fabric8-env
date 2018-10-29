@@ -26,7 +26,10 @@ var _ application.DB = &GormDB{}
 var _ application.Transaction = &GormTransaction{}
 
 func NewGormDB(db *gorm.DB) *GormDB {
-	return &GormDB{GormBase{db}, ""}
+	g := new(GormDB)
+	g.db = db.Set("gorm:save_associations", false)
+	g.txIsoLevel = ""
+	return g
 }
 
 type GormBase struct {

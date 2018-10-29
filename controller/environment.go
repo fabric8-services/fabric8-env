@@ -37,8 +37,6 @@ func ConvertEnvironment(env *environment.Environment) *app.Environment {
 			SpaceID:       env.SpaceID,
 			NamespaceName: env.NamespaceName,
 			ClusterURL:    env.ClusterURL,
-			CreatedAt:     &env.CreatedAt,
-			UpdatedAt:     &env.UpdatedAt,
 		},
 		// TODO add links, relations
 	}
@@ -96,12 +94,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 	spaceID := ctx.SpaceID
 
-	var err error
-	var envs []*environment.Environment
-	err = application.Transactional(c.db, func(appl application.Application) error {
-		envs, err = appl.Environments().List(ctx, spaceID)
-		return err
-	})
+	envs, err := c.db.Environments().List(ctx, spaceID)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
