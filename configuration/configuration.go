@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	commonconfig "github.com/fabric8-services/fabric8-common/configuration"
 	errs "github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -136,7 +137,7 @@ func (c *Registry) GetAuthServiceURL() string {
 
 func (c *Registry) GetDevModePrivateKey() []byte {
 	if c.DeveloperModeEnabled() {
-		return DevModePrivateKey
+		return []byte(commonconfig.DevModeRsaPrivateKey)
 	}
 	return nil
 }
