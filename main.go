@@ -212,7 +212,7 @@ func setupDB(db *gorm.DB, config *configuration.Registry) {
 }
 
 func getTokenManager(config *configuration.Registry) token.Manager {
-	tokenMgr, err := token.NewManager(config)
+	tokenMgr, err := token.DefaultManager(config)
 	if err != nil {
 		log.Panic(nil, map[string]interface{}{"err": err},
 			"failed to setup jwt middleware")

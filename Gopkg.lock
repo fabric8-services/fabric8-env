@@ -71,7 +71,7 @@
     "token",
     "token/jwk"
   ]
-  revision = "2b6ded8f8650db8c287d40ad49a3ac2edcaf9afb"
+  revision = "85e11c21982767f47d3da5e6f59d5b638f8b0313"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -467,6 +467,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bf3955f441b6c3f376e3705c0e489f99297fc676f7bec6feda559f1984ea1182"
+  inputs-digest = "df80d23bd6199972126499fa8db6600cbd8f3e802589c0c0b57833f95f2e6c5d"
   solver-name = "gps-cdcl"
   solver-version = 1
