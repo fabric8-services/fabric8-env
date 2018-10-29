@@ -89,8 +89,8 @@ func checkMigration001(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("insert ok", func(t *testing.T) {
-		_, err := sqlDB.Exec(`INSERT INTO environments (id, name, type, namespace_name, cluster_url)
-			VALUES (uuid_generate_v4(),'osio-stage', 'stage', '', 'cluster1.com')`)
+		_, err := sqlDB.Exec(`INSERT INTO environments (id, name, type, space_id, namespace_name, cluster_url)
+			VALUES (uuid_generate_v4(),'osio-stage', 'stage', uuid_generate_v4(),'', 'cluster1.com')`)
 		require.NoError(t, err)
 	})
 }

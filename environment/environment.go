@@ -14,13 +14,14 @@ type Environment struct {
 	ID            *uuid.UUID
 	Name          *string
 	Type          *string
+	SpaceID       *uuid.UUID
 	NamespaceName *string
 	ClusterURL    *string
 }
 
 type Repository interface {
 	Create(ctx context.Context, env *Environment) (*Environment, error)
-	List(ctx context.Context) ([]*Environment, error)
+	List(ctx context.Context, spaceID uuid.UUID) ([]*Environment, error)
 }
 
 type GormRepository struct {
@@ -38,9 +39,9 @@ func (r *GormRepository) Create(ctx context.Context, env *Environment) (*Environ
 	return env, nil
 }
 
-func (r *GormRepository) List(ctx context.Context) ([]*Environment, error) {
+func (r *GormRepository) List(ctx context.Context, spaceID uuid.UUID) ([]*Environment, error) {
 	var rows []*Environment
-	err := r.db.Model(&Environment{}).Find(&rows).Error
+	err := r.db.Model(&Environment{}).Where("space_id = ?", spaceID).Find(&rows).Error
 	if err != nil {
 		return nil, errs.WithStack(err)
 	}

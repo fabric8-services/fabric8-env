@@ -7,6 +7,9 @@ CREATE TABLE environments (
     id uuid primary key DEFAULT uuid_generate_v4() NOT NULL,
     name text,
     type text,
+    space_id uuid NOT NULL,
     namespace_name text,
     cluster_url text
 );
+
+CREATE INDEX environments_space_id_idx ON environments USING BTREE (space_id);

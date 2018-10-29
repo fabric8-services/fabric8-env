@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/require"
 
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
@@ -33,8 +34,10 @@ func (s *EnvironmentControllerSuite) TestCreateEnvironment() {
 	appDB := gormapp.NewGormDB(s.DB)
 	ctrl := controller.NewEnvironmentController(service, appDB)
 
+	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
+	require.NoError(s.T(), err)
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, payload)
+	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, spaceID, payload)
 }
 
 func (s *EnvironmentControllerSuite) TestListEnvironment() {
@@ -42,10 +45,12 @@ func (s *EnvironmentControllerSuite) TestListEnvironment() {
 	appDB := gormapp.NewGormDB(s.DB)
 	ctrl := controller.NewEnvironmentController(service, appDB)
 
+	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
+	require.NoError(s.T(), err)
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, payload)
+	test.CreateEnvironmentCreated(s.T(), context.Background(), service, ctrl, spaceID, payload)
 
-	_, list := test.ListEnvironmentOK(s.T(), context.Background(), service, ctrl, nil, nil)
+	_, list := test.ListEnvironmentOK(s.T(), context.Background(), service, ctrl, spaceID, nil, nil)
 	require.NotNil(s.T(), list)
 	require.NotEmpty(s.T(), list.Data)
 }

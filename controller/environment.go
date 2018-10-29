@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"context"
+
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
@@ -32,6 +34,7 @@ func ConvertEnvironment(env *environment.Environment) *app.Environment {
 		Attributes: &app.EnvironmentAttributes{
 			Name:          env.Name,
 			Type:          env.Type,
+			SpaceID:       env.SpaceID,
 			NamespaceName: env.NamespaceName,
 			ClusterURL:    env.ClusterURL,
 			CreatedAt:     &env.CreatedAt,
@@ -55,13 +58,18 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 	if reqEnv == nil {
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
 	}
+	spaceID := ctx.SpaceID
+	err := c.checkSpaceExist(ctx, spaceID.String())
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
 
-	var err error
 	var env *environment.Environment
 	err = application.Transactional(c.db, func(appl application.Application) error {
 		newEnv := environment.Environment{
 			Name:          reqEnv.Attributes.Name,
 			Type:          reqEnv.Attributes.Type,
+			SpaceID:       &spaceID,
 			NamespaceName: reqEnv.Attributes.NamespaceName,
 			ClusterURL:    reqEnv.Attributes.ClusterURL,
 		}
@@ -86,10 +94,12 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 }
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
+	spaceID := ctx.SpaceID
+
 	var err error
 	var envs []*environment.Environment
 	err = application.Transactional(c.db, func(appl application.Application) error {
-		envs, err = appl.Environments().List(ctx)
+		envs, err = appl.Environments().List(ctx, spaceID)
 		return err
 	})
 	if err != nil {
@@ -98,4 +108,9 @@ func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 
 	res := ConvertEnvironments(envs)
 	return ctx.OK(res)
+}
+
+func (c *EnvironmentController) checkSpaceExist(ctx context.Context, spaceID string) error {
+	// TODO call api
+	return nil
 }

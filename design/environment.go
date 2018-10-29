@@ -14,7 +14,7 @@ var env = a.Type("Environment", func() {
 		a.Example("40bbdd3d-8b5d-4fd6-ac90-7236b669af04")
 	})
 	a.Attribute("attributes", envAttrs)
-	a.Attribute("relationships", envRelationships)
+	// a.Attribute("relationships", envRelationships)
 	a.Attribute("links", genericLinks)
 	a.Required("type", "attributes")
 })
@@ -26,6 +26,9 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	})
 	a.Attribute("type", d.String, "The environment type", func() {
 		a.Example("stage")
+	})
+	a.Attribute("spaceId", d.UUID, "The space id of the environment", func() {
+		a.Example("40bbdd3d-8b5d-4fd6-ac90-7236b669af04")
 	})
 	a.Attribute("namespaceName", d.String, "The namespace name", func() {
 		a.Example("myapp-stage")
@@ -41,10 +44,10 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	})
 })
 
-var envRelationships = a.Type("EnvironmentRelations", func() {
-	a.Attribute("space", relationGeneric, "Environment associated with one space")
-	// TODO for type
-})
+// var envRelationships = a.Type("EnvironmentRelations", func() {
+// a.Attribute("space", relationGeneric, "Environment associated with one space")
+// TODO for type
+// })
 
 var envListMeta = a.Type("EnvironmentListMeta", func() {
 	a.Attribute("totalCount", d.Integer)
@@ -63,14 +66,17 @@ var envSingle = JSONSingle(
 	nil)
 
 var _ = a.Resource("environment", func() {
-	a.BasePath("/environments")
+	a.BasePath("/spaces")
 
 	a.Action("list", func() {
 		a.Security("jwt")
 		a.Routing(
-			a.GET(""),
+			a.GET("/:spaceID/environments"),
 		)
-		a.Description("List environments.")
+		a.Description("List environments for the given space ID.")
+		a.Params(func() {
+			a.Param("spaceID", d.UUID, "ID of the space")
+		})
 		// TODO required ??
 		// a.Params(func() {
 		// 	a.Param("page[offset]", d.String, "Paging start position")
@@ -89,9 +95,12 @@ var _ = a.Resource("environment", func() {
 	a.Action("create", func() {
 		a.Security("jwt")
 		a.Routing(
-			a.POST(""),
+			a.POST("/:spaceID/environments"),
 		)
 		a.Description("Create environment")
+		a.Params(func() {
+			a.Param("spaceID", d.UUID, "ID of the space")
+		})
 		a.Payload(envSingle)
 		a.Response(d.Created, "/environments/.*", func() {
 			a.Media(envSingle)
