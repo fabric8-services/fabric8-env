@@ -13,7 +13,6 @@ import (
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
-	"github.com/fabric8-services/fabric8-env/resource"
 	"github.com/goadesign/goa"
 	"github.com/stretchr/testify/suite"
 )
@@ -26,7 +25,6 @@ type EnvironmentControllerSuite struct {
 }
 
 func TestEnvironmentController(t *testing.T) {
-	resource.Require(t, resource.Database)
 	config, err := configuration.New("")
 	require.NoError(t, err)
 	suite.Run(t, &EnvironmentControllerSuite{DBTestSuite: testsuite.NewDBTestSuite(config)})
