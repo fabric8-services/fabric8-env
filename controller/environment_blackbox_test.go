@@ -29,6 +29,7 @@ func TestEnvironmentController(t *testing.T) {
 	config, err := configuration.New("")
 	require.NoError(t, err)
 	suite.Run(t, &EnvironmentControllerSuite{DBTestSuite: testsuite.NewDBTestSuite(config)})
+	// TODO add test for all different response code
 }
 
 func (s *EnvironmentControllerSuite) SetupSuite() {
