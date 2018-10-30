@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fabric8-services/fabric8-common/errors"
+	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
@@ -86,8 +87,8 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 	res := &app.EnvironmentSingle{
 		Data: envData,
 	}
-	// TODO use from f8-common
-	// ctx.ResponseData.Header().Set("Location", httpsupport.AbsoluteURL(ctx.Request, app.SpaceHref(res.Data.ID)))
+	ctx.ResponseData.Header().Set("Location", httpsupport.AbsoluteURL(&goa.RequestData{Request: ctx.Request},
+		app.EnvironmentHref(res.Data.Attributes.SpaceID, res.Data.ID), nil))
 	return ctx.Created(res)
 }
 
@@ -100,6 +101,22 @@ func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 	}
 
 	res := ConvertEnvironments(envs)
+	return ctx.OK(res)
+}
+
+func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
+	spaceID := ctx.SpaceID
+	envID := ctx.EnvID
+
+	env, err := c.db.Environments().Load(ctx, envID, spaceID)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
+
+	envData := ConvertEnvironment(env)
+	res := &app.EnvironmentSingle{
+		Data: envData,
+	}
 	return ctx.OK(res)
 }
 

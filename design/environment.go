@@ -97,4 +97,20 @@ var _ = a.Resource("environment", func() {
 		a.Response(d.Conflict, JSONAPIErrors)
 	})
 
+	a.Action("show", func() {
+		a.Routing(
+			a.GET("/:spaceID/environments/:envID"),
+		)
+		a.Description("Retrieve environment (as JSONAPI) for the given ID.")
+		a.Params(func() {
+			a.Param("spaceID", d.UUID, "ID of the space")
+			a.Param("envID", d.UUID, "ID of the environment")
+		})
+		a.Response(d.OK, envSingle)
+		a.Response(d.NotModified)
+		a.Response(d.BadRequest, JSONAPIErrors)
+		a.Response(d.InternalServerError, JSONAPIErrors)
+		a.Response(d.NotFound, JSONAPIErrors)
+	})
+
 })

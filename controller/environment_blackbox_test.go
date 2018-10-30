@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
@@ -37,22 +38,40 @@ func (s *EnvironmentControllerSuite) SetupSuite() {
 	s.db = gormapp.NewGormDB(s.DB)
 	s.ctrl = controller.NewEnvironmentController(s.service, s.db)
 }
-func (s *EnvironmentControllerSuite) TestCreateEnvironment() {
-	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
-	require.NoError(s.T(), err)
+func (s *EnvironmentControllerSuite) TestCreate() {
+	spaceID := uuid.NewV4()
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
+
+	_, newEnv := test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
+
+	assert.NotNil(s.T(), newEnv)
+	assert.NotNil(s.T(), newEnv.Data.ID)
+	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID, *newEnv.Data.ID)
+	require.NotNil(s.T(), env)
+	assert.Equal(s.T(), env.Data.ID, newEnv.Data.ID)
 }
 
-func (s *EnvironmentControllerSuite) TestListEnvironment() {
-	spaceID, err := uuid.FromString("f03f023b-0427-4cdb-924b-fb2369018ab6")
-	require.NoError(s.T(), err)
+func (s *EnvironmentControllerSuite) TestList() {
+	spaceID := uuid.NewV4()
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
-	test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
+	_, newEnv := test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
+	require.NotNil(s.T(), newEnv)
 
 	_, list := test.ListEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID)
-	require.NotNil(s.T(), list)
-	require.NotEmpty(s.T(), list.Data)
+	assert.NotNil(s.T(), list)
+	assert.NotEmpty(s.T(), list.Data)
+	assert.Equal(s.T(), newEnv.Data.ID, list.Data[0].ID)
+}
+
+func (s *EnvironmentControllerSuite) TestShow() {
+	spaceID := uuid.NewV4()
+	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
+	_, newEnv := test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
+	require.NotNil(s.T(), newEnv)
+
+	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID, *newEnv.Data.ID)
+	assert.NotNil(s.T(), env)
+	assert.Equal(s.T(), newEnv.Data.ID, env.Data.ID)
 }
 
 func newCreateEnvironmentPayload(name, envType, clusterURL string) *app.CreateEnvironmentPayload {
