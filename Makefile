@@ -67,6 +67,8 @@ endef
 help: ## Prints this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
+.PHONY: all
+all: prebuild-check deps generate build
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
@@ -87,9 +89,14 @@ $(INSTALL_PREFIX):
 $(TMP_PATH):
 	mkdir -p $(TMP_PATH)
 
+.PHONY: show-info
+show-info:
+	$(call log-info,"$(shell go version)")
+	$(call log-info,"$(shell go env)")
+
 # TODO add CHECK_GOPATH_BIN
 .PHONY: prebuild-check
-prebuild-check: $(TMP_PATH) $(INSTALL_PREFIX) 
+prebuild-check: $(TMP_PATH) $(INSTALL_PREFIX) show-info
 # Check that all tools where found
 ifndef GIT_BIN
 	$(error The "$(GIT_BIN_NAME)" executable could not be found in your PATH)
