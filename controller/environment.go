@@ -35,7 +35,6 @@ func ConvertEnvironment(env *environment.Environment) *app.Environment {
 		Attributes: &app.EnvironmentAttributes{
 			Name:          env.Name,
 			Type:          env.Type,
-			SpaceID:       env.SpaceID,
 			NamespaceName: env.NamespaceName,
 			ClusterURL:    env.ClusterURL,
 		},
@@ -88,7 +87,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		Data: envData,
 	}
 	ctx.ResponseData.Header().Set("Location", httpsupport.AbsoluteURL(&goa.RequestData{Request: ctx.Request},
-		app.EnvironmentHref(res.Data.Attributes.SpaceID, res.Data.ID), nil))
+		app.EnvironmentHref(spaceID, res.Data.ID), nil))
 	return ctx.Created(res)
 }
 

@@ -27,9 +27,6 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	a.Attribute("type", d.String, "The environment type", func() {
 		a.Example("stage")
 	})
-	a.Attribute("spaceId", d.UUID, "The space id of the environment", func() {
-		a.Example("40bbdd3d-8b5d-4fd6-ac90-7236b669af04")
-	})
 	a.Attribute("namespaceName", d.String, "The namespace name", func() {
 		a.Example("myapp-stage")
 	})
