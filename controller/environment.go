@@ -120,6 +120,7 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 }
 
 func (c *EnvironmentController) checkSpaceExist(ctx context.Context, spaceID string) error {
-	// TODO call api
+	// TODO check if space exists
+	// TODO check if space owner is the caller
 	return nil
 }
