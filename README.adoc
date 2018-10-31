@@ -12,4 +12,48 @@ image:https://codecov.io/gh/fabric8-services/fabric8-env/branch/master/graph/bad
 
 Environment service takes care of managing environment.
 
+=== Developer Guide
+
+==== Prerequisites
+
+go (>=1.8), git, mercurial, make, dep
+
+==== Make commands
+
+===== Build project
+
+**Build Project:** generate goa, sqlbinddata related resources, build the project, create executable at `./bin/env`.
+```
+make build
+```
+
+**Clean Project:** clean generated goa, sqlbinddata, executable.
+```
+make clean
+```
+
+===== Run service
+
+**Run service on localhost:** start service on localhost. Check status at - `http://localhost:8080/api/status`.
+```
+export F8_CONFIG_FILE_PATH="config.yaml"
+docker-compose up -d db
+./bin/env
+```
+
 NOTE: config.yaml is *not* processed by default. In order to use it, the following environment variable must be set `export F8_CONFIG_FILE_PATH="config.yaml"`
+
+===== Run tests
+
+**Unit Test:** run tests which does NOT required database.
+```
+make test-unit
+make test-unit-no-coverage
+```
+
+**Integration Test:** run tests which requires database.  Please run `docker-compose` command to start database used by integration tests.
+```
+docker-compose up -d db
+make test-integration
+make test-integration-no-coverage
+```
