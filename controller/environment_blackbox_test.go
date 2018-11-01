@@ -20,9 +20,10 @@ import (
 
 type EnvironmentControllerSuite struct {
 	testsuite.DBTestSuite
-	service *goa.Service
-	db      *gormapp.GormDB
-	ctrl    *controller.EnvironmentController
+	service  *goa.Service
+	db       *gormapp.GormDB
+	ctrl     *controller.EnvironmentController
+	prodCtrl *controller.EnvironmentController
 }
 
 func TestEnvironmentController(t *testing.T) {
@@ -37,7 +38,8 @@ func (s *EnvironmentControllerSuite) SetupSuite() {
 
 	s.service = goa.New("enviroment-test")
 	s.db = gormapp.NewGormDB(s.DB)
-	s.ctrl = controller.NewEnvironmentController(s.service, s.db)
+	s.ctrl = controller.NewEnvironmentController(s.service, s.db, true)
+	s.prodCtrl = controller.NewEnvironmentController(s.service, s.db, false)
 }
 func (s *EnvironmentControllerSuite) TestCreate() {
 	spaceID := uuid.NewV4()
@@ -50,6 +52,14 @@ func (s *EnvironmentControllerSuite) TestCreate() {
 	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, *newEnv.Data.ID)
 	require.NotNil(s.T(), env)
 	assert.Equal(s.T(), env.Data.ID, newEnv.Data.ID)
+}
+
+func (s *EnvironmentControllerSuite) TestCreateNeg() {
+	spaceID := uuid.NewV4()
+	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
+
+	_, err := test.CreateEnvironmentInternalServerError(s.T(), context.Background(), s.service, s.prodCtrl, spaceID, payload)
+	assert.NotNil(s.T(), err)
 }
 
 func (s *EnvironmentControllerSuite) TestList() {

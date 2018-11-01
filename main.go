@@ -105,10 +105,8 @@ func main() {
 	appDB := gormapp.NewGormDB(db)
 
 	// Mount controllers
-	statusCtrl := controller.NewStatusController(service)
-	app.MountStatusController(service, statusCtrl)
-	envCtrl := controller.NewEnvironmentController(service, appDB)
-	app.MountEnvironmentController(service, envCtrl)
+	app.MountStatusController(service, controller.NewStatusController(service))
+	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, config.DeveloperModeEnabled()))
 	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)

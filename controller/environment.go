@@ -18,13 +18,15 @@ const (
 
 type EnvironmentController struct {
 	*goa.Controller
-	db application.DB
+	db                   application.DB
+	developerModeEnabled bool // TODO remove this option
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, developerModeEnabled bool) *EnvironmentController {
 	return &EnvironmentController{
-		Controller: service.NewController("EnvironmentController"),
-		db:         db,
+		Controller:           service.NewController("EnvironmentController"),
+		db:                   db,
+		developerModeEnabled: developerModeEnabled,
 	}
 }
 
@@ -52,6 +54,10 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 }
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
+	if !c.developerModeEnabled {
+		return app.JSONErrorResponse(ctx, errors.NewInternalErrorFromString("operation not supporated"))
+	}
+
 	reqEnv := ctx.Payload.Data
 	if reqEnv == nil {
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
