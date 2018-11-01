@@ -5,6 +5,7 @@ import (
 
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
+	"github.com/fabric8-services/fabric8-common/log"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
@@ -55,6 +56,7 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
 	if !c.developerModeEnabled {
+		log.Debug(ctx, nil, "operation not supporated in production")
 		return app.JSONErrorResponse(ctx, errors.NewInternalErrorFromString("operation not supporated"))
 	}
 
@@ -80,7 +82,9 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 
 		env, err = appl.Environments().Create(ctx, &newEnv)
 		if err != nil {
-			return errs.Wrapf(err, "failed to create space: %s", newEnv.Name)
+			log.Debug(ctx, map[string]interface{}{"err": err},
+				"failed to create environment: %s", newEnv.Name)
+			return errs.Wrapf(err, "failed to create environment: %s", newEnv.Name)
 		}
 		return nil
 	})
