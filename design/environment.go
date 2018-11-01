@@ -57,12 +57,11 @@ var envSingle = JSONSingle(
 	nil)
 
 var _ = a.Resource("environment", func() {
-	a.BasePath("/spaces")
 
 	a.Action("list", func() {
 		a.Security("jwt")
 		a.Routing(
-			a.GET("/:spaceID/environments"),
+			a.GET("/spaces/:spaceID/environments"),
 		)
 		a.Description("List environments for the given space ID.")
 		a.Params(func() {
@@ -78,7 +77,7 @@ var _ = a.Resource("environment", func() {
 	a.Action("create", func() {
 		a.Security("jwt")
 		a.Routing(
-			a.POST("/:spaceID/environments"),
+			a.POST("/spaces/:spaceID/environments"),
 		)
 		a.Description("Create environment")
 		a.Params(func() {
@@ -96,11 +95,10 @@ var _ = a.Resource("environment", func() {
 
 	a.Action("show", func() {
 		a.Routing(
-			a.GET("/:spaceID/environments/:envID"),
+			a.GET("/environments/:envID"),
 		)
 		a.Description("Retrieve environment (as JSONAPI) for the given ID.")
 		a.Params(func() {
-			a.Param("spaceID", d.UUID, "ID of the space")
 			a.Param("envID", d.UUID, "ID of the environment")
 		})
 		a.Response(d.OK, envSingle)

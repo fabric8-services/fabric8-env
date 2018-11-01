@@ -47,7 +47,7 @@ func (s *EnvironmentControllerSuite) TestCreate() {
 
 	assert.NotNil(s.T(), newEnv)
 	assert.NotNil(s.T(), newEnv.Data.ID)
-	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID, *newEnv.Data.ID)
+	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, *newEnv.Data.ID)
 	require.NotNil(s.T(), env)
 	assert.Equal(s.T(), env.Data.ID, newEnv.Data.ID)
 }
@@ -70,7 +70,7 @@ func (s *EnvironmentControllerSuite) TestShow() {
 	_, newEnv := test.CreateEnvironmentCreated(s.T(), context.Background(), s.service, s.ctrl, spaceID, payload)
 	require.NotNil(s.T(), newEnv)
 
-	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, spaceID, *newEnv.Data.ID)
+	_, env := test.ShowEnvironmentOK(s.T(), context.Background(), s.service, s.ctrl, *newEnv.Data.ID)
 	assert.NotNil(s.T(), env)
 	assert.Equal(s.T(), newEnv.Data.ID, env.Data.ID)
 }

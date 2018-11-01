@@ -87,7 +87,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		Data: envData,
 	}
 	ctx.ResponseData.Header().Set("Location", httpsupport.AbsoluteURL(&goa.RequestData{Request: ctx.Request},
-		app.EnvironmentHref(spaceID, res.Data.ID), nil))
+		app.EnvironmentHref(res.Data.ID), nil))
 	return ctx.Created(res)
 }
 
@@ -104,10 +104,9 @@ func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 }
 
 func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
-	spaceID := ctx.SpaceID
 	envID := ctx.EnvID
 
-	env, err := c.db.Environments().Load(ctx, envID, spaceID)
+	env, err := c.db.Environments().Load(ctx, envID)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}

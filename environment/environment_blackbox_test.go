@@ -39,7 +39,7 @@ func (s *EnvironmentRepositorySuite) TestCreate() {
 	require.NoError(s.T(), err)
 	assert.NotNil(s.T(), newEnv)
 	assert.NotNil(s.T(), newEnv.ID)
-	env, err := s.envRepo.Load(context.Background(), *newEnv.ID, spaceID)
+	env, err := s.envRepo.Load(context.Background(), *newEnv.ID)
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), env)
 	assert.Equal(s.T(), env.ID, newEnv.ID)
@@ -73,7 +73,7 @@ func (s *EnvironmentRepositorySuite) TestShow() {
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), newEnv)
 
-	env, err := s.envRepo.Load(context.Background(), *newEnv.ID, spaceID)
+	env, err := s.envRepo.Load(context.Background(), *newEnv.ID)
 	require.NoError(s.T(), err)
 	assert.NotNil(s.T(), env)
 	assert.Equal(s.T(), newEnv.ID, env.ID)
