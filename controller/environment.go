@@ -93,7 +93,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 
 		env, err = appl.Environments().Create(ctx, &newEnv)
 		if err != nil {
-			log.Debug(ctx, map[string]interface{}{"err": err},
+			log.Error(ctx, map[string]interface{}{"err": err},
 				"failed to create environment: %s", newEnv.Name)
 			return errs.Wrapf(err, "failed to create environment: %s", newEnv.Name)
 		}
