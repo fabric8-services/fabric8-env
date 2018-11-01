@@ -85,11 +85,10 @@ var _ = a.Resource("environment", func() {
 		a.Payload(envSingle)
 		a.Response(d.Created, envSingle)
 		a.Response(d.BadRequest, JSONAPIErrors)
-		a.Response(d.NotFound, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.Unauthorized, JSONAPIErrors)
-		a.Response(d.Forbidden, JSONAPIErrors)
-		a.Response(d.Conflict, JSONAPIErrors)
+		// a.Response(d.Forbidden, JSONAPIErrors)
+		a.Response(d.MethodNotAllowed, JSONAPIErrors)
 	})
 
 	a.Action("show", func() {
@@ -101,7 +100,6 @@ var _ = a.Resource("environment", func() {
 			a.Param("envID", d.UUID, "ID of the environment")
 		})
 		a.Response(d.OK, envSingle)
-		a.Response(d.BadRequest, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.NotFound, JSONAPIErrors)
 	})

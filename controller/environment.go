@@ -6,6 +6,7 @@ import (
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
+	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
@@ -56,8 +57,18 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
 	if !c.developerModeEnabled {
-		log.Debug(ctx, nil, "operation not supporated in production")
-		return app.JSONErrorResponse(ctx, errors.NewInternalErrorFromString("operation not supporated"))
+		log.Error(ctx, nil, "operation not allowed")
+		err, _ := app.ErrorToJSONAPIErrors(ctx, errors.NewInternalErrorFromString("operation not allowed"))
+		return ctx.MethodNotAllowed(err)
+	}
+
+	tokenMgr, err := token.ReadManagerFromContext(ctx)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
+	_, err = tokenMgr.Locate(ctx)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
 	}
 
 	reqEnv := ctx.Payload.Data
@@ -65,7 +76,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
 	}
 	spaceID := ctx.SpaceID
-	err := c.checkSpaceExist(ctx, spaceID.String())
+	err = c.checkSpaceExist(ctx, spaceID.String())
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -102,8 +113,16 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 }
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
-	spaceID := ctx.SpaceID
+	tokenMgr, err := token.ReadManagerFromContext(ctx)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
+	_, err = tokenMgr.Locate(ctx)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
+	}
 
+	spaceID := ctx.SpaceID
 	envs, err := c.db.Environments().List(ctx, spaceID)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)

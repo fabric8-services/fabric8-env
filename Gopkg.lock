@@ -67,11 +67,12 @@
     "migration",
     "resource",
     "sentry",
+    "test/auth",
     "test/suite",
     "token",
     "token/jwk"
   ]
-  revision = "85e11c21982767f47d3da5e6f59d5b638f8b0313"
+  revision = "45960af9689499e9f5e5a4ebd142a8189a19ca1e"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -467,6 +468,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "df80d23bd6199972126499fa8db6600cbd8f3e802589c0c0b57833f95f2e6c5d"
+  inputs-digest = "160c74ec7cdd34af77807ab9e460e5e762773e41ab0b66fff6ad1470ceeab10a"
   solver-name = "gps-cdcl"
   solver-version = 1
