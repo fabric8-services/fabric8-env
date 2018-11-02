@@ -213,7 +213,7 @@ endef
 .PHONY: integration-test-env-prepare
 ## Prepares all services needed to run the integration tests.
 ## If not already available, this target will download docker-compose (on Linux).
-integration-test-env-prepare:
+integration-test-env-prepare: $(TMP_PATH)
 ifdef DOCKER_COMPOSE_BIN
 	@$(DOCKER_COMPOSE_BIN) -f $(DOCKER_COMPOSE_FILE) up -d
 else

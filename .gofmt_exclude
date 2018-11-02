@@ -1,3 +1,4 @@
+sqlbindata
 design/.*
 vendor/.*
 app/.*

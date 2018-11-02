@@ -84,6 +84,7 @@ else
 		-t \
 		$(DOCKER_RUN_INTERACTIVE_SWITCH) \
 		--name="$(DOCKER_CONTAINER_NAME)" \
+		-e F8_POSTGRES_PORT=5432 \
 		-v $(CUR_DIR):$(PACKAGE_PATH):Z \
 		-u $(shell id -u $(USER)):$(shell id -g $(USER)) \
 		-e GOPATH=$(GOPATH_IN_CONTAINER) \

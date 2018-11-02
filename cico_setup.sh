@@ -22,7 +22,7 @@ function run_tests_with_coverage() {
   check_postgres_healthiness
 
   # Run the integration tests
-  # make docker-test-migration
+  make docker-test-migration
   make docker-test-integration
 
   # Run the remote tests
