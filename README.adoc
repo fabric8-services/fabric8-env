@@ -10,7 +10,7 @@ image:https://goreportcard.com/badge/github.com/fabric8-services/fabric8-env[Go 
 image:https://godoc.org/github.com/fabric8-services/fabric8-env?status.png[GoDoc,link="https://godoc.org/github.com/fabric8-services/fabric8-env"]
 image:https://codecov.io/gh/fabric8-services/fabric8-env/branch/master/graph/badge.svg[Codecov.io,link="https://codecov.io/gh/fabric8-services/fabric8-env"]
 
-Environment service takes care of managing environment.  Swagger API: http://swagger.goa.design/?url=github.com%2Ffabric8-services%2Ffabric8-env%2Fdesign[link^]
+Environment service takes care of managing environment.  Swagger API: http://swagger.goa.design/?url=github.com%2Ffabric8-services%2Ffabric8-env%2Fdesign[link, role="external", window="_blank"]
 
 === Developer Guide
 
