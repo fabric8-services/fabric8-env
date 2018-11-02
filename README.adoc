@@ -43,6 +43,10 @@ make clean
 
 **Run service on localhost:** start service on localhost. Check status at - `http://localhost:8080/api/status`.
 ----
+make dev
+----
+or alternatively:
+----
 export F8_DEVELOPER_MODE_ENABLED=true
 docker-compose up -d db
 ./bin/env
