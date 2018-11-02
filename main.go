@@ -105,7 +105,7 @@ func main() {
 	appDB := gormapp.NewGormDB(db)
 
 	// Mount controllers
-	app.MountStatusController(service, controller.NewStatusController(service))
+	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
 	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, config.DeveloperModeEnabled()))
 	// ---
 
