@@ -1,4 +1,4 @@
-= Fabric8 Env service
+= OpenShift.io Environment Managment service
 :toc:
 :toclevels: 5
 :sectnums:
@@ -10,6 +10,57 @@ image:https://goreportcard.com/badge/github.com/fabric8-services/fabric8-env[Go 
 image:https://godoc.org/github.com/fabric8-services/fabric8-env?status.png[GoDoc,link="https://godoc.org/github.com/fabric8-services/fabric8-env"]
 image:https://codecov.io/gh/fabric8-services/fabric8-env/branch/master/graph/badge.svg[Codecov.io,link="https://codecov.io/gh/fabric8-services/fabric8-env"]
 
-Environment service takes care of managing environment.
+Swagger API: http://swagger.goa.design/?url=github.com%2Ffabric8-services%2Ffabric8-env%2Fdesign[link]
+
+=== Developer Guide
+
+==== Prerequisites
+
+go (>=1.8), git, mercurial, make, dep
+
+==== Make commands
+
+===== Build project
+
+**Generate Resources:** generate goa, sqlbindata, swagger related resources.
+----
+make generate
+----
+
+NOTE: `./app/`, `./swagger/`, `sqlbindata*.go` under `./migration/**` are generated and should not be edited.
+
+**Build Project:** generate resources, build the project, create executable at `./bin/env`.
+----
+make build
+----
+
+**Clean Project:** clean generated resources and vender, tmp, bin directories.
+----
+make clean
+----
+
+===== Run service
+
+**Run service on localhost:** start service on localhost. Check status at - `http://localhost:8080/api/status`.
+----
+export F8_CONFIG_FILE_PATH="config.yaml"
+docker-compose up -d db
+./bin/env
+----
 
 NOTE: config.yaml is *not* processed by default. In order to use it, the following environment variable must be set `export F8_CONFIG_FILE_PATH="config.yaml"`
+
+===== Execute tests
+
+**Unit Test:** run tests which does NOT require database.
+----
+make test-unit
+make test-unit-no-coverage
+----
+
+**Integration Test:** run tests which requires database.  Please run `docker-compose` command to start database used by integration tests.
+----
+docker-compose up -d db
+make test-integration
+make test-integration-no-coverage
+----
