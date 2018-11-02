@@ -42,7 +42,7 @@ func (s *EnvironmentControllerSuite) SetupSuite() {
 	s.DBTestSuite.SetupSuite()
 
 	s.db = gormapp.NewGormDB(s.DB)
-	svc, err := testauth.ServiceAsUser("enviroment-test1", testauth.NewIdentity())
+	svc, err := testauth.ServiceAsUser("enviroment-test", testauth.NewIdentity())
 	require.NoError(s.T(), err)
 	s.svc = svc
 	s.svc2 = testauth.UnsecuredService("enviroment-test2")

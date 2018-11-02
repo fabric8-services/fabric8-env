@@ -92,6 +92,7 @@ var _ = a.Resource("environment", func() {
 	})
 
 	a.Action("show", func() {
+		a.Security("jwt")
 		a.Routing(
 			a.GET("/environments/:envID"),
 		)
