@@ -198,10 +198,6 @@ format-go-code: prebuild-check ## Formats any go file that differs from gofmt's 
 	@gofmt -s -l -w ${GOFORMAT_FILES}
 
 
-# support for dev mode
-$(FRESH_BIN): $(VENDOR_DIR)
-	cd $(VENDOR_DIR)/github.com/pilu/fresh && go build -v
-
 # support for generating goa code
 $(GOAGEN_BIN): $(VENDOR_DIR)
 	cd $(VENDOR_DIR)/github.com/goadesign/goa/goagen && go build -v
@@ -248,8 +244,8 @@ clean: $(CLEAN_TARGETS) ## Runs all clean-* targets.
 
 # run in dev mode
 .PHONY: dev
-dev: prebuild-check deps generate $(FRESH_BIN) docker-compose-up
-	F8_DEVELOPER_MODE_ENABLED=true $(FRESH_BIN)
+dev: prebuild-check deps generate docker-compose-up
+	F8_DEVELOPER_MODE_ENABLED=true $(INSTALL_PREFIX)/env
 
 
 .PHONY: docker-compose-up
