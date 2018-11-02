@@ -63,12 +63,35 @@ endef
 # ----------------------------------------
 # targets
 # ----------------------------------------
-.PHONY: help
-help: ## Prints this help
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
+.DEFAULT_GOAL := all
 
 .PHONY: all
 all: prebuild-check deps generate build
+
+.PHONY: help
+# Based on https://gist.github.com/rcmachado/af3db315e31383502660
+## display this help text.
+help:/
+	$(info Available targets)
+	$(info -----------------)
+	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
+		helpMessage = match(lastLine, /^## (.*)/); \
+		helpCommand = substr($$1, 0, index($$1, ":")-1); \
+		if (helpMessage) { \
+			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+			gsub(/##/, "\n                                     ", helpMessage); \
+			printf "%-35s -> %s\n", helpCommand, helpMessage; \
+			lastLine = "" \
+		} \
+	} \
+	{ hasComment = match(lastLine, /^## (.*)/); \
+          if(hasComment) { \
+            lastLine=lastLine$$0; \
+	  } \
+          else { \
+	    lastLine = $$0 \
+          } \
+        }' $(MAKEFILE_LIST)
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)

@@ -111,6 +111,7 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varPostgresConnectionMaxIdle, -1)
 	c.v.SetDefault(varPostgresConnectionMaxOpen, -1)
 	c.v.SetDefault(varPostgresTransactionTimeout, time.Duration(5*time.Minute))
+	c.v.SetDefault(varPostgresConnectionRetrySleep, time.Duration(time.Second))
 }
 
 func (c *Registry) GetLogLevel() string {
@@ -131,8 +132,15 @@ func (c *Registry) GetAuthKeysPath() string {
 	return c.v.GetString(varAuthKeysPath)
 }
 
+// GetAuthServiceUrl returns Auth Service URL
 func (c *Registry) GetAuthServiceURL() string {
-	return c.v.GetString(varAuthURL)
+	if c.v.IsSet(varAuthURL) {
+		return c.v.GetString(varAuthURL)
+	}
+	if c.DeveloperModeEnabled() {
+		return "https://auth.prod-preview.openshift.io"
+	}
+	return ""
 }
 
 func (c *Registry) GetDevModePrivateKey() []byte {
