@@ -9,17 +9,25 @@ import (
 var Status = a.MediaType("application/vnd.status+json", func() {
 	a.Description("The status of the current running instance")
 	a.Attributes(func() {
-		a.Attribute("commit", d.String, "Commit SHA this build is based on")
-		a.Attribute("buildTime", d.String, "The time when built")
-		a.Attribute("startTime", d.String, "The time when started")
-		a.Attribute("error", d.String, "The error if any")
-		a.Required("commit", "buildTime", "startTime")
+		a.Attribute("commit", d.String, "Commit SHA this build is based on", func() {
+			a.Example("35c4ca5aea9003f492cfa02f1211491385fe2ed7")
+		})
+		a.Attribute("buildTime", d.String, "The time when built", func() {
+			a.Example("2018-11-02T07:11:53Z")
+		})
+		a.Attribute("startTime", d.String, "The time when started", func() {
+			a.Example("2018-11-02T07:47:46Z")
+		})
+		a.Attribute("databaseStatus", d.String, "The status of Database connection. 'OK' or an error message is displayed.", func() {
+			a.Example("OK")
+		})
+		a.Required("commit", "buildTime", "startTime", "databaseStatus")
 	})
 	a.View("default", func() {
 		a.Attribute("commit")
 		a.Attribute("buildTime")
 		a.Attribute("startTime")
-		a.Attribute("error")
+		a.Attribute("databaseStatus")
 	})
 })
 

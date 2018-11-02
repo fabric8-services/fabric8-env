@@ -67,6 +67,8 @@ endef
 help: ## Prints this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
+.PHONY: all
+all: prebuild-check deps generate build
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
@@ -87,9 +89,14 @@ $(INSTALL_PREFIX):
 $(TMP_PATH):
 	mkdir -p $(TMP_PATH)
 
+.PHONY: show-info
+show-info:
+	$(call log-info,"$(shell go version)")
+	$(call log-info,"$(shell go env)")
+
 # TODO add CHECK_GOPATH_BIN
 .PHONY: prebuild-check
-prebuild-check: $(TMP_PATH) $(INSTALL_PREFIX) 
+prebuild-check: $(TMP_PATH) $(INSTALL_PREFIX) show-info
 # Check that all tools where found
 ifndef GIT_BIN
 	$(error The "$(GIT_BIN_NAME)" executable could not be found in your PATH)
@@ -199,6 +206,8 @@ CLEAN_TARGETS += clean-generated
 clean-generated:
 	-rm -rf ./app
 	-rm -rf ./swagger/
+	-rm -f ./migration/sqlbindata.go
+	-rm -f ./migration/sqlbindata_test.go
 
 CLEAN_TARGETS += clean-vendor
 .PHONY: clean-vendor
@@ -253,10 +262,30 @@ migrate-database: $(BINARY_SERVER_BIN)
 
 
 .PHONY: generate
-generate: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Generate GOA sources. Only necessary after clean of if changed `design` folder.
+generate: app/controllers.go migration/sqlbindata.go migration/sqlbindata_test.go
+
+app/controllers.go: prebuild-check $(DESIGNS) $(GOAGEN_BIN) $(VENDOR_DIR) ## Generate GOA sources. Only necessary after clean of if changed `design` folder.
 	$(GOAGEN_BIN) app -d ${PACKAGE_NAME}/${DESIGN_DIR}
 	$(GOAGEN_BIN) controller -d ${PACKAGE_NAME}/${DESIGN_DIR} -o controller/ --pkg controller --app-pkg ${PACKAGE_NAME}/app
 	$(GOAGEN_BIN) gen -d ${PACKAGE_NAME}/${DESIGN_DIR} --pkg-path=github.com/fabric8-services/fabric8-common/goasupport/status --out app
 	$(GOAGEN_BIN) gen -d ${PACKAGE_NAME}/${DESIGN_DIR} --pkg-path=github.com/fabric8-services/fabric8-common/goasupport/jsonapi_errors_helpers --out app
 	$(GOAGEN_BIN) swagger -d ${PACKAGE_NAME}/${DESIGN_DIR}
-	
+
+migration/sqlbindata.go: $(GO_BINDATA_BIN)
+	$(GO_BINDATA_BIN) \
+		-o migration/sqlbindata.go \
+		-pkg migration \
+		-prefix migration/sql-files \
+		-nocompress \
+		migration/sql-files
+
+migration/sqlbindata_test.go: $(GO_BINDATA_BIN)
+	$(GO_BINDATA_BIN) \
+		-o migration/sqlbindata_test.go \
+		-pkg migration_test \
+		-prefix migration/sql-test-files \
+		-nocompress \
+		migration/sql-test-files
+
+$(GO_BINDATA_BIN): $(VENDOR_DIR)
+	cd $(VENDOR_DIR)/github.com/jteeuwen/go-bindata/go-bindata && go build -v

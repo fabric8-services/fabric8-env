@@ -1,29 +1,4 @@
-# Gopkg.toml example
-#
 # Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
-# for detailed Gopkg.toml documentation.
-#
-# required = ["github.com/user/thing/cmd/thing"]
-# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
-#
-# [[constraint]]
-#   name = "github.com/user/project"
-#   version = "1.0.0"
-#
-# [[constraint]]
-#   name = "github.com/user/project2"
-#   branch = "dev"
-#   source = "github.com/myfork/project2"
-#
-# [[override]]
-#   name = "github.com/x/y"
-#   version = "2.4.0"
-#
-# [prune]
-#   non-go = false
-#   go-tests = true
-#   unused-packages = true
-
 
 required = [
   "github.com/fabric8-services/fabric8-common/goasupport/jsonapi_errors_helpers", # needed by goa generator
@@ -42,6 +17,7 @@ required = [
   "github.com/goadesign/goa/goatest",
   "github.com/davecgh/go-spew/spew",
   "github.com/golang/lint/golint",
+  "github.com/jteeuwen/go-bindata/go-bindata",
   "github.com/fzipp/gocyclo",
   "github.com/pilu/fresh", # used to rebuild if source changed while running
   "github.com/wadey/gocovmerge",
@@ -51,11 +27,14 @@ ignored = [
   "github.com/fabric8-services/fabric8-env/app",
 ]
 
-
 [prune]
   go-tests = true
   unused-packages = true
 
 [[constraint]]
+  name = "github.com/jteeuwen/go-bindata"
+  revision = "v3.0.7"
+
+[[constraint]]
   name = "github.com/fabric8-services/fabric8-common"
-  revision = "51e44b47e514721ddaa3fca99e5fb5bc1a6e7eb2"
+  revision = "45960af9689499e9f5e5a4ebd142a8189a19ca1e"

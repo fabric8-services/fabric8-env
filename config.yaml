@@ -1,2 +1,20 @@
+# General
 developer.mode.enabled: false
 log.level: info
+
+# Postgres
+postgres.host: localhost
+postgres.port: 5436
+postgres.user: postgres
+postgres.password: mysecretpassword
+postgres.database: postgres
+postgres.sslmode: disable
+postgres.connection.timeout: 5
+postgres.connection.retrysleep: 1s
+postgres.connection.maxidle: -1
+postgres.connection.maxopen: -1
+postgres.transaction.timeout: 5m
+
+# Auth service
+auth.url : https://auth.prod-preview.openshift.io
+auth.keys.path : /api/token/keys

@@ -1,9 +1,8 @@
+# fabric8-env specific artifacts
+/debug
+**/debug.test
+
 # Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
 bin
 
 # Test binary, build with `go test -c`
@@ -15,9 +14,11 @@ bin
 # vendored deps are not kept in git
 vendor
 
-# generate goa code
+# generate assets
 app
 swagger
+migration/sqlbindata.go
+migration/sqlbindata_test.go
 
 # tmp dir
 tmp
