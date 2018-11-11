@@ -38,3 +38,7 @@ ignored = [
 [[constraint]]
   name = "github.com/fabric8-services/fabric8-common"
   revision = "45960af9689499e9f5e5a4ebd142a8189a19ca1e"
+
+[[constraint]]
+  name = "github.com/fabric8-services/fabric8-auth-client"
+  branch = "master"

@@ -50,6 +50,12 @@
   version = "v5.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/fabric8-services/fabric8-auth-client"
+  packages = ["auth"]
+  revision = "0eb93fc6cee1e202cb0f3ade92e99a2423b49283"
+
+[[projects]]
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
     "closeable",
@@ -468,6 +474,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "160c74ec7cdd34af77807ab9e460e5e762773e41ab0b66fff6ad1470ceeab10a"
+  inputs-digest = "63fd156eab7081117dcd3b6fdce087f95efe88c5f5eb0b30bc2ecfc6b444f3c2"
   solver-name = "gps-cdcl"
   solver-version = 1

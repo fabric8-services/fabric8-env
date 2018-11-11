@@ -18,6 +18,7 @@ import (
 	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
+	"github.com/fabric8-services/fabric8-env/client"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
@@ -102,11 +103,17 @@ func main() {
 	service.Use(metric.Recorder("fabric8_env"))
 	// ---
 
+	authClient, err := client.NewAuthClient(config.GetAuthServiceURL())
+	if err != nil {
+		log.Panic(nil, map[string]interface{}{"url": config.GetAuthServiceURL(), "err": err},
+			"could not create Auth client")
+	}
+
 	appDB := gormapp.NewGormDB(db)
 
 	// Mount controllers
 	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
-	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, config.DeveloperModeEnabled()))
+	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authClient))
 	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)
