@@ -20,10 +20,10 @@ const (
 type EnvironmentController struct {
 	*goa.Controller
 	db         application.DB
-	authClient *client.AuthClient
+	authClient *client.Auth
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB, authClient *client.AuthClient) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, authClient *client.Auth) *EnvironmentController {
 	return &EnvironmentController{
 		Controller: service.NewController("EnvironmentController"),
 		db:         db,

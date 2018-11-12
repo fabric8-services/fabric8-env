@@ -7,12 +7,13 @@ import (
 	"net/url"
 
 	"github.com/fabric8-services/fabric8-auth-client/auth"
+	"github.com/fabric8-services/fabric8-common/errors"
 	goaclient "github.com/goadesign/goa/client"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	errs "github.com/pkg/errors"
 )
 
-func NewAuthClient(hostURL string) (*AuthClient, error) {
+func NewAuthClient(hostURL string) (*Auth, error) {
 	u, err := url.Parse(hostURL)
 	if err != nil {
 		return nil, err
@@ -24,7 +25,7 @@ func NewAuthClient(hostURL string) (*AuthClient, error) {
 	})
 	c.Host = u.Host
 	c.Scheme = u.Scheme
-	return &AuthClient{c}, nil
+	return &Auth{c}, nil
 }
 
 type doer struct {
@@ -39,11 +40,11 @@ func (d *doer) Do(ctx context.Context, req *http.Request) (*http.Response, error
 	return d.target.Do(ctx, req)
 }
 
-type AuthClient struct {
+type Auth struct {
 	*auth.Client
 }
 
-func (c *AuthClient) CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) error {
+func (c *Auth) CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) error {
 	resp, err := c.Client.ScopesResource(ctx, auth.ScopesResourcePath(spaceID))
 	if err != nil {
 		return err
@@ -59,5 +60,5 @@ func (c *AuthClient) CheckSpaceScope(ctx context.Context, spaceID, requiredScope
 			return nil
 		}
 	}
-	return errs.Errorf("user doesn't have '%s' permission on '%s' space", requiredScope, spaceID)
+	return errors.NewUnauthorizedError(fmt.Sprintf("user doesn't have '%s' permission on '%s' space", requiredScope, spaceID))
 }
