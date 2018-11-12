@@ -18,11 +18,11 @@ import (
 	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
-	"github.com/fabric8-services/fabric8-env/client"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
 	"github.com/fabric8-services/fabric8-env/migration"
+	apiservice "github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	goalogrus "github.com/goadesign/goa/logging/logrus"
 	"github.com/goadesign/goa/middleware"
@@ -103,7 +103,7 @@ func main() {
 	service.Use(metric.Recorder("fabric8_env"))
 	// ---
 
-	authClient, err := client.NewAuthClient(config.GetAuthServiceURL())
+	authService, err := apiservice.NewAuthService(config.GetAuthServiceURL())
 	if err != nil {
 		log.Panic(nil, map[string]interface{}{"url": config.GetAuthServiceURL(), "err": err},
 			"could not create Auth client")
@@ -113,7 +113,7 @@ func main() {
 
 	// Mount controllers
 	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
-	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authClient))
+	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authService))
 	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)

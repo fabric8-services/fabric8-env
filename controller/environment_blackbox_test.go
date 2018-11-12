@@ -14,10 +14,10 @@ import (
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/app/test"
-	"github.com/fabric8-services/fabric8-env/client"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
+	"github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	"github.com/stretchr/testify/suite"
 )
@@ -41,13 +41,13 @@ func (s *EnvironmentControllerSuite) SetupSuite() {
 	s.DBTestSuite.SetupSuite()
 
 	s.db = gormapp.NewGormDB(s.DB)
-	authClient, err := client.NewAuthClient("https://auth.prod-preview.openshift.io")
+	authService, err := service.NewAuthService("https://auth.prod-preview.openshift.io")
 	require.NoError(s.T(), err)
 
 	svc := testauth.UnsecuredService("enviroment-test")
 	s.svc = svc
 	s.ctx = s.svc.Context
-	s.ctrl = controller.NewEnvironmentController(s.svc, s.db, authClient)
+	s.ctrl = controller.NewEnvironmentController(s.svc, s.db, authService)
 }
 
 func (s *EnvironmentControllerSuite) TestCreate() {

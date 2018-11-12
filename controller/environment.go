@@ -6,8 +6,8 @@ import (
 	"github.com/fabric8-services/fabric8-common/log"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
-	"github.com/fabric8-services/fabric8-env/client"
 	"github.com/fabric8-services/fabric8-env/environment"
+	"github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	errs "github.com/pkg/errors"
 )
@@ -18,15 +18,15 @@ const (
 
 type EnvironmentController struct {
 	*goa.Controller
-	db         application.DB
-	authClient *client.Auth
+	db          application.DB
+	authService service.Auth
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB, authClient *client.Auth) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, authService service.Auth) *EnvironmentController {
 	return &EnvironmentController{
-		Controller: service.NewController("EnvironmentController"),
-		db:         db,
-		authClient: authClient,
+		Controller:  service.NewController("EnvironmentController"),
+		db:          db,
+		authService: authService,
 	}
 }
 
@@ -60,7 +60,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 	}
 
 	spaceID := ctx.SpaceID
-	err := c.authClient.CheckSpaceScope(ctx, spaceID.String(), "manage")
+	err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "manage")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -98,7 +98,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 	spaceID := ctx.SpaceID
-	err := c.authClient.CheckSpaceScope(ctx, spaceID.String(), "contribute")
+	err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -121,7 +121,7 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 	}
 
 	spaceID := env.SpaceID
-	err = c.authClient.CheckSpaceScope(ctx, spaceID.String(), "contribute")
+	err = c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}

@@ -1,4 +1,4 @@
-package client
+package service
 
 import (
 	"context"
@@ -6,26 +6,30 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/fabric8-services/fabric8-auth-client/auth"
+	authclient "github.com/fabric8-services/fabric8-auth-client/auth"
 	"github.com/fabric8-services/fabric8-common/errors"
 	goaclient "github.com/goadesign/goa/client"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	errs "github.com/pkg/errors"
 )
 
-func NewAuthClient(hostURL string) (*Auth, error) {
+type Auth interface {
+	CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) error
+}
+
+func NewAuthService(hostURL string) (Auth, error) {
 	u, err := url.Parse(hostURL)
 	if err != nil {
 		return nil, err
 	}
 
 	client := http.Client{}
-	c := auth.New(&doer{
+	c := authclient.New(&doer{
 		target: goaclient.HTTPClientDoer(&client),
 	})
 	c.Host = u.Host
 	c.Scheme = u.Scheme
-	return &Auth{c}, nil
+	return &auth{c}, nil
 }
 
 type doer struct {
@@ -40,12 +44,12 @@ func (d *doer) Do(ctx context.Context, req *http.Request) (*http.Response, error
 	return d.target.Do(ctx, req)
 }
 
-type Auth struct {
-	*auth.Client
+type auth struct {
+	*authclient.Client
 }
 
-func (c *Auth) CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) error {
-	resp, err := c.Client.ScopesResource(ctx, auth.ScopesResourcePath(spaceID))
+func (c *auth) CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) error {
+	resp, err := c.Client.ScopesResource(ctx, authclient.ScopesResourcePath(spaceID))
 	if err != nil {
 		return err
 	}
