@@ -103,6 +103,7 @@ var _ = a.Resource("environment", func() {
 		a.Response(d.OK, envSingle)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.NotFound, JSONAPIErrors)
+		a.Response(d.Unauthorized, JSONAPIErrors)
 	})
 
 })

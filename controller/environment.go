@@ -4,7 +4,6 @@ import (
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
-	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/client"
@@ -55,22 +54,13 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 }
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
-	tokenMgr, err := token.ReadManagerFromContext(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, err)
-	}
-	_, err = tokenMgr.Locate(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
-	}
-
 	reqEnv := ctx.Payload.Data
 	if reqEnv == nil {
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
 	}
 
 	spaceID := ctx.SpaceID
-	err = c.authClient.CheckSpaceScope(ctx, spaceID.String(), "manage")
+	err := c.authClient.CheckSpaceScope(ctx, spaceID.String(), "manage")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -107,17 +97,8 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 }
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
-	tokenMgr, err := token.ReadManagerFromContext(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, err)
-	}
-	_, err = tokenMgr.Locate(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
-	}
-
 	spaceID := ctx.SpaceID
-	err = c.authClient.CheckSpaceScope(ctx, spaceID.String(), "contribute")
+	err := c.authClient.CheckSpaceScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
