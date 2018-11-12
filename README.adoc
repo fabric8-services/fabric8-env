@@ -12,15 +12,15 @@ image:https://codecov.io/gh/fabric8-services/fabric8-env/branch/master/graph/bad
 
 Swagger API: http://swagger.goa.design/?url=github.com%2Ffabric8-services%2Ffabric8-env%2Fdesign[link]
 
-=== Developer Guide
+== Developer Guide
 
-==== Prerequisites
+=== Prerequisites
 
 go (>=1.8), git, mercurial, make, dep
 
-==== Make commands
+=== Make commands
 
-===== Build project
+==== Build project
 
 **Generate Resources:** generate goa, sqlbindata, swagger related resources.
 ----
@@ -39,7 +39,7 @@ make build
 make clean
 ----
 
-===== Run service
+==== Run service
 
 **Run service on localhost:** start service on localhost. Check status at - `http://localhost:8080/api/status`.
 ----
@@ -54,7 +54,7 @@ docker-compose up -d db
 
 NOTE: config.yaml is *not* processed by default. In order to use it, the following environment variable must be set `export F8_CONFIG_FILE_PATH="config.yaml"`
 
-===== Execute tests
+==== Execute tests
 
 **Unit Test:** run tests which does NOT require database.
 ----
