@@ -1,13 +1,15 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
+	"github.com/fabric8-services/fabric8-common/service"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
-	"github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	errs "github.com/pkg/errors"
 )
@@ -60,9 +62,12 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 	}
 
 	spaceID := ctx.SpaceID
-	err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "manage")
+	authZ, err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "manage")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
+	}
+	if authZ == false {
+		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(fmt.Sprintf("user doesn't have 'manage' permission on '%s' space", spaceID)))
 	}
 
 	var env *environment.Environment
@@ -98,9 +103,12 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
 	spaceID := ctx.SpaceID
-	err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
+	authZ, err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
+	}
+	if authZ == false {
+		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(fmt.Sprintf("user doesn't have 'contribute' permission on '%s' space", spaceID)))
 	}
 
 	envs, err := c.db.Environments().List(ctx, spaceID)
@@ -121,9 +129,12 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 	}
 
 	spaceID := env.SpaceID
-	err = c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
+	authZ, err := c.authService.CheckSpaceScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
+	}
+	if authZ == false {
+		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(fmt.Sprintf("user doesn't have 'contribute' permission on '%s' space", spaceID)))
 	}
 
 	envData := ConvertEnvironment(env)

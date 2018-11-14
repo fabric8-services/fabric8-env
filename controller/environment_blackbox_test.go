@@ -10,6 +10,7 @@ import (
 	gock "gopkg.in/h2non/gock.v1"
 
 	"github.com/fabric8-services/fabric8-auth-client/auth"
+	"github.com/fabric8-services/fabric8-common/service"
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-env/app"
@@ -17,7 +18,6 @@ import (
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
-	"github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	"github.com/stretchr/testify/suite"
 )

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/fabric8-services/fabric8-common/service"
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-common/token"
@@ -17,7 +18,6 @@ import (
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
-	"github.com/fabric8-services/fabric8-env/service"
 	"github.com/goadesign/goa"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"

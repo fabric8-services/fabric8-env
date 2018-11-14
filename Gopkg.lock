@@ -56,6 +56,7 @@
   revision = "0eb93fc6cee1e202cb0f3ade92e99a2423b49283"
 
 [[projects]]
+  branch = "env_i10"
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
     "closeable",
@@ -64,6 +65,7 @@
     "convert/ptr",
     "errors",
     "goamiddleware",
+    "goasupport",
     "goasupport/jsonapi_errors_helpers",
     "goasupport/status",
     "gormsupport",
@@ -73,12 +75,14 @@
     "migration",
     "resource",
     "sentry",
+    "service",
     "test/auth",
     "test/suite",
     "token",
     "token/jwk"
   ]
-  revision = "45960af9689499e9f5e5a4ebd142a8189a19ca1e"
+  revision = "160f543ca3db154e2e3792ff0ef0496febcc9f82"
+  source = "github.com/nurali-techie/fabric8-common"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -479,6 +483,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7e5a490233afa61b2bc7f61240964026e85ae4bf327369a4fc1511421632a14c"
+  inputs-digest = "553a6bcd164bdeab981ad636b2e49ef6f418c7fb7936ebabc315d5fee04259e8"
   solver-name = "gps-cdcl"
   solver-version = 1
