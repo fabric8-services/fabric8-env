@@ -110,59 +110,64 @@ func (s *EnvironmentSpaceScopeSuite) TestAllScope() {
 	payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster1.com")
 	var newEnv *app.EnvironmentSingle
 
-	s.T().Run("user1_create", func(t *testing.T) {
-		_, newEnv = test.CreateEnvironmentCreated(t, s.ctx1, s.svc, s.ctrl, s.spaceID, payload)
-		assert.NotNil(t, newEnv)
+	s.T().Run("user1", func(t *testing.T) {
+		t.Run("create", func(t *testing.T) {
+			_, newEnv = test.CreateEnvironmentCreated(t, s.ctx1, s.svc, s.ctrl, s.spaceID, payload)
+			assert.NotNil(t, newEnv)
+		})
+
+		t.Run("list", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, list := test.ListEnvironmentOK(t, s.ctx1, s.svc, s.ctrl, s.spaceID)
+			assert.NotNil(t, list)
+		})
+
+		t.Run("show", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, env := test.ShowEnvironmentOK(t, s.ctx1, s.svc, s.ctrl, *newEnv.Data.ID)
+			assert.NotNil(t, env)
+		})
 	})
 
-	s.T().Run("user1_list", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, list := test.ListEnvironmentOK(t, s.ctx1, s.svc, s.ctrl, s.spaceID)
-		assert.NotNil(t, list)
+	s.T().Run("user2", func(t *testing.T) {
+		t.Run("create", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, err := test.CreateEnvironmentUnauthorized(t, s.ctx2, s.svc, s.ctrl, s.spaceID, payload)
+			assert.NotNil(t, err)
+		})
+
+		t.Run("list", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, list := test.ListEnvironmentOK(t, s.ctx2, s.svc, s.ctrl, s.spaceID)
+			assert.NotNil(t, list)
+		})
+
+		t.Run("show", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, env := test.ShowEnvironmentOK(t, s.ctx2, s.svc, s.ctrl, *newEnv.Data.ID)
+			assert.NotNil(t, env)
+		})
 	})
 
-	s.T().Run("user1_show", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, env := test.ShowEnvironmentOK(t, s.ctx1, s.svc, s.ctrl, *newEnv.Data.ID)
-		assert.NotNil(t, env)
-	})
+	s.T().Run("user3", func(t *testing.T) {
+		t.Run("create", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, err := test.CreateEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID, payload)
+			assert.NotNil(t, err)
+		})
 
-	s.T().Run("user2_create", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, err := test.CreateEnvironmentUnauthorized(t, s.ctx2, s.svc, s.ctrl, s.spaceID, payload)
-		assert.NotNil(t, err)
-	})
+		t.Run("list", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, err := test.ListEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID)
+			assert.NotNil(t, err)
+		})
 
-	s.T().Run("user2_list", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, list := test.ListEnvironmentOK(t, s.ctx2, s.svc, s.ctrl, s.spaceID)
-		assert.NotNil(t, list)
+		t.Run("show", func(t *testing.T) {
+			require.NotNil(t, newEnv)
+			_, err := test.ShowEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, *newEnv.Data.ID)
+			assert.NotNil(t, err)
+		})
 	})
-
-	s.T().Run("user2_show", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, env := test.ShowEnvironmentOK(t, s.ctx2, s.svc, s.ctrl, *newEnv.Data.ID)
-		assert.NotNil(t, env)
-	})
-
-	s.T().Run("user3_create", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, err := test.CreateEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID, payload)
-		assert.NotNil(t, err)
-	})
-
-	s.T().Run("user3_list", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, err := test.ListEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID)
-		assert.NotNil(t, err)
-	})
-
-	s.T().Run("user3_show", func(t *testing.T) {
-		require.NotNil(t, newEnv)
-		_, err := test.ShowEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, *newEnv.Data.ID)
-		assert.NotNil(t, err)
-	})
-
 }
 
 func (s *EnvironmentSpaceScopeSuite) startAuthServer() *httptest.Server {
