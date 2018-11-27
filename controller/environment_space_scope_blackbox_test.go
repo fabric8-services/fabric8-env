@@ -9,10 +9,9 @@ import (
 	"testing"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/fabric8-services/fabric8-common/service"
+	"github.com/fabric8-services/fabric8-common/auth"
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
-	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/app/test"
 	"github.com/fabric8-services/fabric8-env/configuration"
@@ -79,7 +78,7 @@ func (s *EnvironmentSpaceScopeSuite) SetupSuite() {
 	s.db = gormapp.NewGormDB(s.DB)
 	s.authServer = s.startAuthServer()
 	authURL := "http://" + s.authServer.Listener.Addr().String() + "/"
-	authService, err := service.NewAuthService(authURL)
+	authService, err := auth.NewAuthService(authURL)
 	require.NoError(s.T(), err)
 
 	s.svc = testauth.UnsecuredService("enviroment-test")
@@ -93,7 +92,7 @@ func (s *EnvironmentSpaceScopeSuite) SetupSuite() {
 	s.ctx3, _, err = testauth.EmbedUserTokenInContext(context.Background(), testUser3)
 	require.NoError(s.T(), err)
 
-	tokenMgr, err := token.ReadManagerFromContext(s.ctx1)
+	tokenMgr, err := auth.ReadManagerFromContext(s.ctx1)
 	require.NoError(s.T(), err)
 	keys := tokenMgr.PublicKeys()
 	require.NotNil(s.T(), keys)
@@ -132,7 +131,7 @@ func (s *EnvironmentSpaceScopeSuite) TestAllScope() {
 	s.T().Run("user2", func(t *testing.T) {
 		t.Run("create", func(t *testing.T) {
 			require.NotNil(t, newEnv)
-			_, err := test.CreateEnvironmentUnauthorized(t, s.ctx2, s.svc, s.ctrl, s.spaceID, payload)
+			_, err := test.CreateEnvironmentForbidden(t, s.ctx2, s.svc, s.ctrl, s.spaceID, payload)
 			assert.NotNil(t, err)
 		})
 
@@ -152,19 +151,19 @@ func (s *EnvironmentSpaceScopeSuite) TestAllScope() {
 	s.T().Run("user3", func(t *testing.T) {
 		t.Run("create", func(t *testing.T) {
 			require.NotNil(t, newEnv)
-			_, err := test.CreateEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID, payload)
+			_, err := test.CreateEnvironmentForbidden(t, s.ctx3, s.svc, s.ctrl, s.spaceID, payload)
 			assert.NotNil(t, err)
 		})
 
 		t.Run("list", func(t *testing.T) {
 			require.NotNil(t, newEnv)
-			_, err := test.ListEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, s.spaceID)
+			_, err := test.ListEnvironmentForbidden(t, s.ctx3, s.svc, s.ctrl, s.spaceID)
 			assert.NotNil(t, err)
 		})
 
 		t.Run("show", func(t *testing.T) {
 			require.NotNil(t, newEnv)
-			_, err := test.ShowEnvironmentUnauthorized(t, s.ctx3, s.svc, s.ctrl, *newEnv.Data.ID)
+			_, err := test.ShowEnvironmentForbidden(t, s.ctx3, s.svc, s.ctrl, *newEnv.Data.ID)
 			assert.NotNil(t, err)
 		})
 	})

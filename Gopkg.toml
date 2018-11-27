@@ -37,5 +37,4 @@ ignored = [
 
 [[constraint]]
   name = "github.com/fabric8-services/fabric8-common"
-  source = "github.com/nurali-techie/fabric8-common"
-  branch = "env_i10"
+  revision = "b10e057d860d730661b2440dc1326c7d82606acc"

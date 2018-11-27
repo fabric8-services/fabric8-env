@@ -26,18 +26,19 @@ func (c *Registry) String() string {
 }
 
 const (
-	varLogLevel             = "log.level"
-	varLogJSON              = "log.json"
-	varAuthURL              = "auth.url"
-	varAuthKeysPath         = "auth.keys.path"
-	varHTTPAddress          = "http.address"
-	varMetricsHTTPAddress   = "metrics.http.address"
-	varDiagnoseHTTPAddress  = "diagnose.http.address"
-	varEnvironment          = "environment"
-	varDeveloperModeEnabled = "developer.mode.enabled"
-	varSentryDSN            = "sentry.dsn"
-	varCleanTestDataEnabled = "clean.test.data"
-	varDBLogsEnabled        = "enable.db.logs"
+	varLogLevel                            = "log.level"
+	varLogJSON                             = "log.json"
+	varAuthURL                             = "auth.url"
+	varAuthKeysPath                        = "auth.keys.path"
+	varHTTPAddress                         = "http.address"
+	varMetricsHTTPAddress                  = "metrics.http.address"
+	varDiagnoseHTTPAddress                 = "diagnose.http.address"
+	varEnvironment                         = "environment"
+	varDeveloperModeEnabled                = "developer.mode.enabled"
+	varSentryDSN                           = "sentry.dsn"
+	varCleanTestDataEnabled                = "clean.test.data"
+	varCleanTestDataErrorReportingRequired = "clean.test.data.error.reporting.required"
+	varDBLogsEnabled                       = "enable.db.logs"
 
 	// postgres
 	varPostgresHost                 = "postgres.host"
@@ -99,6 +100,7 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varMetricsHTTPAddress, "0.0.0.0:8080")
 	c.v.SetDefault(varDeveloperModeEnabled, false)
 	c.v.SetDefault(varCleanTestDataEnabled, true)
+	c.v.SetDefault(varCleanTestDataErrorReportingRequired, true)
 	c.v.SetDefault(varDBLogsEnabled, false)
 
 	c.v.SetDefault(varPostgresHost, "localhost")
@@ -244,6 +246,10 @@ func (c *Registry) GetPostgresTransactionTimeout() time.Duration {
 
 func (c *Registry) IsCleanTestDataEnabled() bool {
 	return c.v.GetBool(varCleanTestDataEnabled)
+}
+
+func (c *Registry) IsCleanTestDataErrorReportingRequired() bool {
+	return c.v.GetBool(varCleanTestDataErrorReportingRequired)
 }
 
 func (c *Registry) IsDBLogsEnabled() bool {

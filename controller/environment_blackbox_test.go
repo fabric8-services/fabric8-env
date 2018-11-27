@@ -30,8 +30,8 @@ type EnvironmentControllerSuite struct {
 
 type testAuthService struct{}
 
-func (s *testAuthService) CheckSpaceScope(ctx context.Context, spaceID, requiredScope string) (bool, error) {
-	return true, nil
+func (s *testAuthService) RequireScope(ctx context.Context, resourceID, requiredScope string) error {
+	return nil
 }
 
 func TestEnvironmentController(t *testing.T) {
