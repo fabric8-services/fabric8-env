@@ -71,6 +71,7 @@ var _ = a.Resource("environment", func() {
 		a.Response(d.BadRequest, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.Unauthorized, JSONAPIErrors)
+		a.Response(d.Forbidden, JSONAPIErrors)
 	})
 
 	a.Action("create", func() {
@@ -87,7 +88,7 @@ var _ = a.Resource("environment", func() {
 		a.Response(d.BadRequest, JSONAPIErrors)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.Unauthorized, JSONAPIErrors)
-		// a.Response(d.Forbidden, JSONAPIErrors)
+		a.Response(d.Forbidden, JSONAPIErrors)
 		a.Response(d.MethodNotAllowed, JSONAPIErrors)
 	})
 
@@ -103,6 +104,8 @@ var _ = a.Resource("environment", func() {
 		a.Response(d.OK, envSingle)
 		a.Response(d.InternalServerError, JSONAPIErrors)
 		a.Response(d.NotFound, JSONAPIErrors)
+		a.Response(d.Unauthorized, JSONAPIErrors)
+		a.Response(d.Forbidden, JSONAPIErrors)
 	})
 
 })

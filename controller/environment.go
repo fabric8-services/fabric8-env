@@ -1,12 +1,10 @@
 package controller
 
 import (
-	"context"
-
+	"github.com/fabric8-services/fabric8-common/auth"
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
-	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/environment"
@@ -20,15 +18,15 @@ const (
 
 type EnvironmentController struct {
 	*goa.Controller
-	db                   application.DB
-	developerModeEnabled bool // TODO remove this option
+	db          application.DB
+	authService auth.AuthService
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB, developerModeEnabled bool) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, authService auth.AuthService) *EnvironmentController {
 	return &EnvironmentController{
-		Controller:           service.NewController("EnvironmentController"),
-		db:                   db,
-		developerModeEnabled: developerModeEnabled,
+		Controller:  service.NewController("EnvironmentController"),
+		db:          db,
+		authService: authService,
 	}
 }
 
@@ -56,27 +54,13 @@ func ConvertEnvironments(envs []*environment.Environment) *app.EnvironmentsList 
 }
 
 func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error {
-	if !c.developerModeEnabled {
-		log.Error(ctx, nil, "operation not allowed")
-		err, _ := app.ErrorToJSONAPIErrors(ctx, errors.NewInternalErrorFromString("operation not allowed"))
-		return ctx.MethodNotAllowed(err)
-	}
-
-	tokenMgr, err := token.ReadManagerFromContext(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, err)
-	}
-	_, err = tokenMgr.Locate(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
-	}
-
 	reqEnv := ctx.Payload.Data
 	if reqEnv == nil {
 		return app.JSONErrorResponse(ctx, errors.NewBadParameterError("data", nil).Expected("not nil"))
 	}
+
 	spaceID := ctx.SpaceID
-	err = c.checkSpaceExist(ctx, spaceID.String())
+	err := c.authService.RequireScope(ctx, spaceID.String(), "manage")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -113,16 +97,12 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 }
 
 func (c *EnvironmentController) List(ctx *app.ListEnvironmentContext) error {
-	tokenMgr, err := token.ReadManagerFromContext(ctx)
+	spaceID := ctx.SpaceID
+	err := c.authService.RequireScope(ctx, spaceID.String(), "contribute")
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
-	_, err = tokenMgr.Locate(ctx)
-	if err != nil {
-		return app.JSONErrorResponse(ctx, errors.NewUnauthorizedError(err.Error()))
-	}
 
-	spaceID := ctx.SpaceID
 	envs, err := c.db.Environments().List(ctx, spaceID)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
@@ -140,15 +120,15 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 		return app.JSONErrorResponse(ctx, err)
 	}
 
+	spaceID := env.SpaceID
+	err = c.authService.RequireScope(ctx, spaceID.String(), "contribute")
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
+
 	envData := ConvertEnvironment(env)
 	res := &app.EnvironmentSingle{
 		Data: envData,
 	}
 	return ctx.OK(res)
-}
-
-func (c *EnvironmentController) checkSpaceExist(ctx context.Context, spaceID string) error {
-	// TODO check if space exists
-	// TODO check if space owner is the caller
-	return nil
 }

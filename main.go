@@ -9,13 +9,13 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/fabric8-services/fabric8-common/auth"
 	"github.com/fabric8-services/fabric8-common/closeable"
 	"github.com/fabric8-services/fabric8-common/convert/ptr"
 	"github.com/fabric8-services/fabric8-common/goamiddleware"
 	"github.com/fabric8-services/fabric8-common/log"
 	"github.com/fabric8-services/fabric8-common/metric"
 	"github.com/fabric8-services/fabric8-common/sentry"
-	"github.com/fabric8-services/fabric8-common/token"
 	"github.com/fabric8-services/fabric8-env/app"
 	"github.com/fabric8-services/fabric8-env/application"
 	"github.com/fabric8-services/fabric8-env/configuration"
@@ -95,18 +95,24 @@ func main() {
 	tokenMgr := getTokenManager(config)
 	tokenCtxMW := goamiddleware.TokenContext(tokenMgr, app.NewJWTSecurity())
 	service.Use(tokenCtxMW)
-	service.Use(token.InjectTokenManager(tokenMgr))
+	service.Use(auth.InjectTokenManager(tokenMgr))
 
 	service.Use(log.LogRequest(config.DeveloperModeEnabled()))
 	app.UseJWTMiddleware(service, jwt.New(tokenMgr.PublicKeys(), nil, app.NewJWTSecurity()))
 	service.Use(metric.Recorder("fabric8_env"))
 	// ---
 
+	authService, err := auth.NewAuthService(config.GetAuthServiceURL())
+	if err != nil {
+		log.Panic(nil, map[string]interface{}{"url": config.GetAuthServiceURL(), "err": err},
+			"could not create Auth client")
+	}
+
 	appDB := gormapp.NewGormDB(db)
 
 	// Mount controllers
 	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
-	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, config.DeveloperModeEnabled()))
+	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authService))
 	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)
@@ -209,8 +215,8 @@ func setupDB(db *gorm.DB, config *configuration.Registry) {
 	application.SetDatabaseTransactionTimeout(config.GetPostgresTransactionTimeout())
 }
 
-func getTokenManager(config *configuration.Registry) token.Manager {
-	tokenMgr, err := token.DefaultManager(config)
+func getTokenManager(config *configuration.Registry) auth.Manager {
+	tokenMgr, err := auth.DefaultManager(config)
 	if err != nil {
 		log.Panic(nil, map[string]interface{}{"err": err},
 			"failed to setup jwt middleware")
