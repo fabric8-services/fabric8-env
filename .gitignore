@@ -54,6 +54,8 @@ app
 swagger
 migration/sqlbindata.go
 migration/sqlbindata_test.go
+env/
+tool/
 
 # tmp dir
 tmp

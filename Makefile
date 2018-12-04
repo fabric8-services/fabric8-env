@@ -202,7 +202,9 @@ format-go-code: prebuild-check ## Formats any go file that differs from gofmt's 
 $(GOAGEN_BIN): $(VENDOR_DIR)
 	cd $(VENDOR_DIR)/github.com/goadesign/goa/goagen && go build -v
 
-
+.PHONY: generate-client
+generate-client: $(GOAGEN_BIN)
+	$(GOAGEN_BIN) client -d github.com/fabric8-services/fabric8-env/design --pkg env
 
 # -------------------------------------------------------------------
 # clean
@@ -227,6 +229,8 @@ clean-generated:
 	-rm -rf ./swagger/
 	-rm -f ./migration/sqlbindata.go
 	-rm -f ./migration/sqlbindata_test.go
+	-rm -rf ./env
+	-rm -rf ./tool
 
 CLEAN_TARGETS += clean-vendor
 .PHONY: clean-vendor
@@ -262,7 +266,6 @@ endif
 # build the binary executable (to ship in prod)
 LDFLAGS=-ldflags "-X ${PACKAGE_NAME}/app.Commit=${COMMIT} -X ${PACKAGE_NAME}/app.BuildTime=${BUILD_TIME}"
 
-# TODO add BINARY_CLIENT_BIN
 .PHONY: build
 build: prebuild-check deps generate $(BINARY_SERVER_BIN)
 
