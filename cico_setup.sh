@@ -64,9 +64,10 @@ function load_jenkins_vars() {
               GIT_COMMIT \
               BUILD_NUMBER \
               BUILD_TAG \
+              BUILD_URL \
+              FABRIC8_HUB_TOKEN \
               ghprbSourceBranch \
               ghprbActualCommit \
-              BUILD_URL \
               ghprbPullId)"
   fi
 }
