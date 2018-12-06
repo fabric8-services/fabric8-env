@@ -10,6 +10,8 @@ if [ ! -f .cico-prepare ]; then
 
     run_tests_with_coverage;
 
+    generate_client;
+
     touch .cico-prepare
 fi
 

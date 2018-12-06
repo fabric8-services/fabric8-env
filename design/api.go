@@ -6,7 +6,7 @@ import (
 )
 
 // API the function to define the top-level API DSL of the application.
-var _ = a.API("fabric8-env", func() {
+var _ = a.API("env", func() {
 	a.Host("openshift.io")
 	a.Scheme("http")
 	a.BasePath("/api")

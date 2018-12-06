@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# functions to generate client
+source <(curl -s https://raw.githubusercontent.com/fabric8-services/fabric8-common/master/.scripts/create_push_client.sh)
+
 set -x
 set -e
 
@@ -36,6 +39,17 @@ function run_tests_with_coverage() {
   bash <(curl -s https://codecov.io/bash) -t 1b0a3526-5545-411d-860d-7afab0fba3e6
 
   echo "CICO: ran tests and uploaded coverage"
+}
+
+function generate_client() {
+  SERVICE_NAME=fabric8-env
+  PKG_NAME=env
+  TOOL_DIR=tool
+  GHORG_NAME=fabric8-services
+  GHREPO_NAME=fabric8-env-client
+
+  # function in create_push_client.sh
+  generate_client_setup ${SERVICE_NAME} ${PKG_NAME} ${TOOL_DIR} ${GHORG_NAME} ${GHREPO_NAME}
 }
 
 # Source environment variables of the jenkins slave
