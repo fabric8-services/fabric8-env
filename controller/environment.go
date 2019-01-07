@@ -1,7 +1,11 @@
 package controller
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/fabric8-services/fabric8-common/auth"
+	"github.com/fabric8-services/fabric8-common/cluster"
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
@@ -18,15 +22,17 @@ const (
 
 type EnvironmentController struct {
 	*goa.Controller
-	db          application.DB
-	authService auth.AuthService
+	db             application.DB
+	authService    auth.AuthService
+	clusterService cluster.Service
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB, authService auth.AuthService) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, authService auth.AuthService, clusterService cluster.Service) *EnvironmentController {
 	return &EnvironmentController{
-		Controller:  service.NewController("EnvironmentController"),
-		db:          db,
-		authService: authService,
+		Controller:     service.NewController("EnvironmentController"),
+		db:             db,
+		authService:    authService,
+		clusterService: clusterService,
 	}
 }
 
@@ -65,6 +71,11 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		return app.JSONErrorResponse(ctx, err)
 	}
 
+	err = c.checkClustersUser(ctx, *reqEnv.Attributes.ClusterURL)
+	if err != nil {
+		return app.JSONErrorResponse(ctx, err)
+	}
+
 	var env *environment.Environment
 	err = application.Transactional(c.db, func(appl application.Application) error {
 		newEnv := environment.Environment{
@@ -78,8 +89,8 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		env, err = appl.Environments().Create(ctx, &newEnv)
 		if err != nil {
 			log.Error(ctx, map[string]interface{}{"err": err},
-				"failed to create environment: %s", newEnv.Name)
-			return errs.Wrapf(err, "failed to create environment: %s", newEnv.Name)
+				"failed to create environment: %s", *newEnv.Name)
+			return errs.Wrapf(err, "failed to create environment: %s", *newEnv.Name)
 		}
 		return nil
 	})
@@ -131,4 +142,18 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 		Data: envData,
 	}
 	return ctx.OK(res)
+}
+
+func (c *EnvironmentController) checkClustersUser(ctx context.Context, clusterURL string) error {
+	clusters, err := c.clusterService.ClustersUser(ctx)
+	if err != nil {
+		return err
+	}
+	clusterURL = httpsupport.RemoveTrailingSlashFromURL(clusterURL)
+	for _, cluster := range clusters.Data {
+		if httpsupport.RemoveTrailingSlashFromURL(cluster.APIURL) == clusterURL {
+			return nil
+		}
+	}
+	return errors.NewInternalErrorFromString(fmt.Sprintf("cluster with URL '%s' not linked with user account", clusterURL))
 }

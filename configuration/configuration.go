@@ -10,7 +10,7 @@ import (
 	errs "github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func (c *Registry) String() string {
@@ -29,6 +29,7 @@ const (
 	varLogLevel                            = "log.level"
 	varLogJSON                             = "log.json"
 	varAuthURL                             = "auth.url"
+	varClusterURL                          = "cluster.url"
 	varAuthKeysPath                        = "auth.keys.path"
 	varHTTPAddress                         = "http.address"
 	varMetricsHTTPAddress                  = "metrics.http.address"
@@ -141,6 +142,16 @@ func (c *Registry) GetAuthServiceURL() string {
 	}
 	if c.DeveloperModeEnabled() {
 		return "https://auth.prod-preview.openshift.io"
+	}
+	return ""
+}
+
+func (c *Registry) GetClusterServiceURL() string {
+	if c.v.IsSet(varClusterURL) {
+		return c.v.GetString(varClusterURL)
+	}
+	if c.DeveloperModeEnabled() {
+		return "https://cluster.prod-preview.openshift.io"
 	}
 	return ""
 }

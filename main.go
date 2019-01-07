@@ -11,6 +11,7 @@ import (
 
 	"github.com/fabric8-services/fabric8-common/auth"
 	"github.com/fabric8-services/fabric8-common/closeable"
+	"github.com/fabric8-services/fabric8-common/cluster"
 	"github.com/fabric8-services/fabric8-common/convert/ptr"
 	"github.com/fabric8-services/fabric8-common/goamiddleware"
 	"github.com/fabric8-services/fabric8-common/log"
@@ -102,17 +103,25 @@ func main() {
 	service.Use(metric.Recorder("fabric8_env"))
 	// ---
 
+	// Used services
 	authService, err := auth.NewAuthService(config.GetAuthServiceURL())
 	if err != nil {
 		log.Panic(nil, map[string]interface{}{"url": config.GetAuthServiceURL(), "err": err},
 			"could not create Auth client")
 	}
 
+	clusterService, err := cluster.NewClusterService(config.GetClusterServiceURL())
+	if err != nil {
+		log.Panic(nil, map[string]interface{}{"url": config.GetClusterServiceURL(), "err": err},
+			"could not create Cluster client")
+	}
+
 	appDB := gormapp.NewGormDB(db)
+	// ---
 
 	// Mount controllers
 	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
-	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authService))
+	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authService, clusterService))
 	// ---
 
 	log.Logger().Infoln("Git Commit SHA: ", app.Commit)
