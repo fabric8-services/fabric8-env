@@ -40,7 +40,7 @@ type testClusterService struct{}
 func (s *testClusterService) ClustersUser(ctx context.Context) (*clusterclient.ClusterList, error) {
 	return &clusterclient.ClusterList{
 		Data: []*clusterclient.ClusterData{
-			&clusterclient.ClusterData{
+			{
 				Name:   "cluster1",
 				APIURL: "cluster1.com",
 			},

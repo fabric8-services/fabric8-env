@@ -58,7 +58,10 @@
 [[projects]]
   branch = "nt_wrapper"
   name = "github.com/fabric8-services/fabric8-cluster-client"
-  packages = ["cluster"]
+  packages = [
+    "cluster",
+    "service"
+  ]
   revision = "254ee6bb23168f9edfcbb6c929001b7c0dc1f1f6"
   source = "github.com/nurali-techie/fabric8-cluster-client"
 
@@ -492,6 +495,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0b5d6035b8b47020e189071fa04d64c141a4d9a669bc73e4d0ed3ecffbf5da62"
+  inputs-digest = "758ab044f423f313a1425f7c449b60504446fe1805c507e8972a297207894268"
   solver-name = "gps-cdcl"
   solver-version = 1
