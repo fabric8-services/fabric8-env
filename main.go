@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"time"
 
+	clusterclient "github.com/fabric8-services/fabric8-cluster-client/service"
 	"github.com/fabric8-services/fabric8-common/auth"
 	"github.com/fabric8-services/fabric8-common/closeable"
-	"github.com/fabric8-services/fabric8-common/cluster"
 	"github.com/fabric8-services/fabric8-common/convert/ptr"
 	"github.com/fabric8-services/fabric8-common/goamiddleware"
 	"github.com/fabric8-services/fabric8-common/log"
@@ -110,7 +110,7 @@ func main() {
 			"could not create Auth client")
 	}
 
-	clusterService, err := cluster.NewClusterService(config.GetClusterServiceURL())
+	clusterService, err := clusterclient.NewClusterService(config.GetClusterServiceURL())
 	if err != nil {
 		log.Panic(nil, map[string]interface{}{"url": config.GetClusterServiceURL(), "err": err},
 			"could not create Cluster client")

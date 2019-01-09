@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	clusterclient "github.com/fabric8-services/fabric8-cluster-client/service"
 	"github.com/fabric8-services/fabric8-common/auth"
-	"github.com/fabric8-services/fabric8-common/cluster"
 	"github.com/fabric8-services/fabric8-common/errors"
 	"github.com/fabric8-services/fabric8-common/httpsupport"
 	"github.com/fabric8-services/fabric8-common/log"
@@ -24,10 +24,10 @@ type EnvironmentController struct {
 	*goa.Controller
 	db             application.DB
 	authService    auth.AuthService
-	clusterService cluster.Service
+	clusterService clusterclient.Service
 }
 
-func NewEnvironmentController(service *goa.Service, db application.DB, authService auth.AuthService, clusterService cluster.Service) *EnvironmentController {
+func NewEnvironmentController(service *goa.Service, db application.DB, authService auth.AuthService, clusterService clusterclient.Service) *EnvironmentController {
 	return &EnvironmentController{
 		Controller:     service.NewController("EnvironmentController"),
 		db:             db,

@@ -56,6 +56,13 @@
   revision = "0eb93fc6cee1e202cb0f3ade92e99a2423b49283"
 
 [[projects]]
+  branch = "nt_wrapper"
+  name = "github.com/fabric8-services/fabric8-cluster-client"
+  packages = ["cluster"]
+  revision = "254ee6bb23168f9edfcbb6c929001b7c0dc1f1f6"
+  source = "github.com/nurali-techie/fabric8-cluster-client"
+
+[[projects]]
   name = "github.com/fabric8-services/fabric8-common"
   packages = [
     "auth",
@@ -79,7 +86,7 @@
     "test/auth",
     "test/suite"
   ]
-  revision = "b10e057d860d730661b2440dc1326c7d82606acc"
+  revision = "5bb2b51fb241b42824f86cb79c50574ab0c0c57f"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -223,6 +230,12 @@
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
 [[projects]]
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
+  version = "v1.0.1"
+
+[[projects]]
   name = "github.com/lib/pq"
   packages = [
     ".",
@@ -345,8 +358,8 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "ba1b36c82c5e05c4f912a88eab0dcd91a171688f"
-  version = "v0.11.5"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -415,7 +428,8 @@
   packages = [
     "ed25519",
     "ed25519/internal/edwards25519",
-    "pbkdf2"
+    "pbkdf2",
+    "ssh/terminal"
   ]
   revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
 
@@ -428,7 +442,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
 
 [[projects]]
@@ -475,6 +492,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "62cc6b96499b2a2f2e8e031b3fc11abfa0b4ee82b934731cf3d7b4b015510cf5"
+  inputs-digest = "0b5d6035b8b47020e189071fa04d64c141a4d9a669bc73e4d0ed3ecffbf5da62"
   solver-name = "gps-cdcl"
   solver-version = 1
