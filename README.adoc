@@ -5,7 +5,7 @@
 :sectnumlevels: 4
 :toc-placement: preamble
 
-image:https://ci.centos.org/buildStatus/icon?job=devtools-fabric8-env-build-master[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-fabric8-env-build-master/lastBuild/"]
+image:https://ci.centos.org/buildStatus/icon?job=devtools-fabric8-env-build-master-push-client[Jenkins,link="https://ci.centos.org/view/Devtools/job/devtools-fabric8-env-build-master-push-client/lastBuild/"]
 image:https://goreportcard.com/badge/github.com/fabric8-services/fabric8-env[Go Report Card, link="https://goreportcard.com/report/github.com/fabric8-services/fabric8-env"]
 image:https://godoc.org/github.com/fabric8-services/fabric8-env?status.png[GoDoc,link="https://godoc.org/github.com/fabric8-services/fabric8-env"]
 image:https://codecov.io/gh/fabric8-services/fabric8-env/branch/master/graph/badge.svg[Codecov.io,link="https://codecov.io/gh/fabric8-services/fabric8-env"]
