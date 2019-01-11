@@ -37,7 +37,7 @@ func (s *testAuthService) RequireScope(ctx context.Context, resourceID, required
 
 type testClusterService struct{}
 
-func (s *testClusterService) ClustersUser(ctx context.Context) (*clusterclient.ClusterList, error) {
+func (s *testClusterService) UserClusters(ctx context.Context) (*clusterclient.ClusterList, error) {
 	return &clusterclient.ClusterList{
 		Data: []*clusterclient.ClusterData{
 			{

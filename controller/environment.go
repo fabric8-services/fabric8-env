@@ -145,7 +145,7 @@ func (c *EnvironmentController) Show(ctx *app.ShowEnvironmentContext) error {
 }
 
 func (c *EnvironmentController) checkClustersUser(ctx context.Context, clusterURL string) error {
-	clusters, err := c.clusterService.ClustersUser(ctx)
+	clusters, err := c.clusterService.UserClusters(ctx)
 	if err != nil {
 		return err
 	}

@@ -41,5 +41,4 @@ ignored = [
 
 [[constraint]]
   name = "github.com/fabric8-services/fabric8-cluster-client"
-  source = "github.com/nurali-techie/fabric8-cluster-client"
-  branch = "nt_wrapper"
+  branch = "master"
