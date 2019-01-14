@@ -25,4 +25,5 @@ objects:
     postgres.connection.maxopen: "90"
     environment: prod-preview
     auth.url: https://auth.prod-preview.openshift.io
+    cluster.url: https://cluster.prod-preview.openshift.io
   

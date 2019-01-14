@@ -82,7 +82,7 @@ func (s *EnvironmentSpaceScopeSuite) SetupSuite() {
 	require.NoError(s.T(), err)
 
 	s.svc = testauth.UnsecuredService("enviroment-test")
-	s.ctrl = controller.NewEnvironmentController(s.svc, s.db, authService)
+	s.ctrl = controller.NewEnvironmentController(s.svc, s.db, authService, &testClusterService{})
 	s.spaceID = uuid.NewV4()
 
 	s.ctx1, _, err = testauth.EmbedUserTokenInContext(context.Background(), testUser1)
