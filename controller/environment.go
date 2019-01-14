@@ -155,5 +155,5 @@ func (c *EnvironmentController) checkClustersUser(ctx context.Context, clusterUR
 			return nil
 		}
 	}
-	return errors.NewInternalErrorFromString(fmt.Sprintf("cluster with URL '%s' not linked with user account", clusterURL))
+	return errors.NewForbiddenError(fmt.Sprintf("cluster with URL '%s' not linked with user account", clusterURL))
 }

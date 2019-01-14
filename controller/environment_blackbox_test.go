@@ -84,7 +84,7 @@ func (s *EnvironmentControllerSuite) TestCreate() {
 		spaceID := uuid.NewV4()
 		payload := newCreateEnvironmentPayload("osio-stage", "stage", "cluster2.com")
 
-		_, err := test.CreateEnvironmentInternalServerError(t, s.ctx, s.svc, s.ctrl, spaceID, payload)
+		_, err := test.CreateEnvironmentForbidden(t, s.ctx, s.svc, s.ctrl, spaceID, payload)
 		assert.NotNil(t, err)
 	})
 }
