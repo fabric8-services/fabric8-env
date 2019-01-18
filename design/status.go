@@ -18,16 +18,18 @@ var Status = a.MediaType("application/vnd.status+json", func() {
 		a.Attribute("startTime", d.String, "The time when started", func() {
 			a.Example("2018-11-02T07:47:46Z")
 		})
-		a.Attribute("databaseStatus", d.String, "The status of Database connection. 'OK' or an error message is displayed.", func() {
-			a.Example("OK")
-		})
-		a.Required("commit", "buildTime", "startTime", "databaseStatus")
+		a.Attribute("devMode", d.Boolean, "'True' if the Developer Mode is enabled")
+		a.Attribute("databaseStatus", d.String, "The status of Database connection. 'OK' or an error message is displayed.")
+		a.Attribute("configurationStatus", d.String, "The status of the used configuration. 'OK' or an error message if there is something wrong with the configuration used by service.")
+		a.Required("commit", "buildTime", "startTime", "databaseStatus", "configurationStatus")
 	})
 	a.View("default", func() {
 		a.Attribute("commit")
 		a.Attribute("buildTime")
 		a.Attribute("startTime")
+		a.Attribute("devMode")
 		a.Attribute("databaseStatus")
+		a.Attribute("configurationStatus")
 	})
 })
 

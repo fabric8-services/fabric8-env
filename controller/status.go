@@ -9,15 +9,22 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type statusConfig interface {
+	DeveloperModeEnabled() bool
+	DefaultConfigError() error
+}
+
 type StatusController struct {
 	*goa.Controller
 	dbChecker DBChecker
+	config    statusConfig
 }
 
-func NewStatusController(service *goa.Service, dbChecker DBChecker) *StatusController {
+func NewStatusController(service *goa.Service, dbChecker DBChecker, config statusConfig) *StatusController {
 	return &StatusController{
 		Controller: service.NewController("StatusController"),
 		dbChecker:  dbChecker,
+		config:     config,
 	}
 }
 
@@ -27,14 +34,33 @@ func (c *StatusController) Show(ctx *app.ShowStatusContext) error {
 	res.BuildTime = app.BuildTime
 	res.StartTime = app.StartTime
 
-	err := c.dbChecker.Ping()
-	if err != nil {
+	devMode := c.config.DeveloperModeEnabled()
+	if devMode {
+		res.DevMode = &devMode
+	}
+
+	dbErr := c.dbChecker.Ping()
+	if dbErr != nil {
 		log.Error(ctx, map[string]interface{}{
-			"db_error": err.Error(),
+			"db_error": dbErr.Error(),
 		}, "database configuration error")
-		res.DatabaseStatus = fmt.Sprintf("Error: %s", err.Error())
+		res.DatabaseStatus = fmt.Sprintf("Error: %s", dbErr.Error())
 	} else {
 		res.DatabaseStatus = "OK"
+	}
+
+	configErr := c.config.DefaultConfigError()
+	if configErr != nil {
+		log.Error(ctx, map[string]interface{}{
+			"config_error": configErr.Error(),
+		}, "configuration error")
+		res.ConfigurationStatus = fmt.Sprintf("Error: %s", configErr.Error())
+	} else {
+		res.ConfigurationStatus = "OK"
+	}
+
+	if dbErr != nil || (configErr != nil && !devMode) {
+		return ctx.ServiceUnavailable(res)
 	}
 
 	return ctx.OK(res)
