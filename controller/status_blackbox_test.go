@@ -1,7 +1,9 @@
 package controller_test
 
 import (
-	"context"
+	"errors"
+	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -16,8 +18,20 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const (
+	wantConfigErrMsgForDevMode  = "Error: developer Mode is enabled; default DB password is used; Sentry DSN is empty"
+	wantConfigErrMsgForProdMode = "Error: default DB password is used; Sentry DSN is empty; Auth service url is empty; Cluster service url is empty"
+)
+
 type StatusControllerSuite struct {
 	testsuite.DBTestSuite
+}
+
+type testDBChecker struct {
+}
+
+func (t *testDBChecker) Ping() error {
+	return errors.New("DB is unreachable")
 }
 
 func TestStatusController(t *testing.T) {
@@ -26,15 +40,91 @@ func TestStatusController(t *testing.T) {
 	suite.Run(t, &StatusControllerSuite{DBTestSuite: testsuite.NewDBTestSuite(config)})
 }
 
-func (s *StatusControllerSuite) TestShowStatus() {
-	service := goa.New("status-test")
-	ctrl := controller.NewStatusController(service, controller.NewGormDBChecker(s.DBTestSuite.DB))
+func (s *StatusControllerSuite) UnSecuredController() (*goa.Service, *controller.StatusController) {
+	config, err := configuration.New("")
+	require.NoError(s.T(), err)
+	svc := goa.New("status-test")
+	ctrl := controller.NewStatusController(svc, controller.NewGormDBChecker(s.DBTestSuite.DB), config)
+	return svc, ctrl
+}
 
-	_, res := test.ShowStatusOK(s.T(), context.Background(), service, ctrl)
+func (s *StatusControllerSuite) UnSecuredControllerWithUnreachableDB() (*goa.Service, *controller.StatusController) {
+	config, err := configuration.New("")
+	require.NoError(s.T(), err)
+	svc := goa.New("status-test")
+	ctrl := controller.NewStatusController(svc, &testDBChecker{}, config)
+	return svc, ctrl
+}
 
-	assert.Equal(s.T(), app.Commit, res.Commit, "Commit is not correct")
-	assert.Equal(s.T(), app.StartTime, res.StartTime, "StartTime is not correct")
-	_, err := time.Parse("2006-01-02T15:04:05Z", res.StartTime)
-	assert.Nil(s.T(), err, "Incorrect layout of StartTime")
-	assert.Equal(s.T(), "OK", res.DatabaseStatus)
+func (s *StatusControllerSuite) TestShow() {
+
+	s.T().Run("ok_with_dev_mode", func(t *testing.T) {
+		currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
+		defer os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
+
+		wantDevMode := true
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", strconv.FormatBool(wantDevMode))
+		svc, ctrl := s.UnSecuredController()
+
+		_, got := test.ShowStatusOK(t, svc.Context, svc, ctrl)
+
+		checkStatus(t, got)
+		assert.Equal(t, wantDevMode, *got.DevMode)
+		assert.Equal(t, "OK", got.DatabaseStatus)
+		assert.Equal(t, wantConfigErrMsgForDevMode, got.ConfigurationStatus)
+	})
+
+	s.T().Run("ok_with_dev_mode_with_config_issue", func(t *testing.T) {
+		currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
+		defer os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
+
+		wantDevMode := true
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", strconv.FormatBool(wantDevMode))
+		svc, ctrl := s.UnSecuredController()
+
+		_, got := test.ShowStatusOK(t, svc.Context, svc, ctrl)
+
+		checkStatus(t, got)
+		assert.Equal(t, wantDevMode, *got.DevMode)
+		assert.Equal(t, "OK", got.DatabaseStatus)
+		assert.Equal(t, wantConfigErrMsgForDevMode, got.ConfigurationStatus)
+	})
+
+	s.T().Run("service_unavailable_with_config_issue", func(t *testing.T) {
+		currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
+		defer os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
+
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", "false")
+		svc, ctrl := s.UnSecuredController()
+
+		_, got := test.ShowStatusServiceUnavailable(t, svc.Context, svc, ctrl)
+
+		assert.Nil(t, got.DevMode)
+		assert.Equal(t, "OK", got.DatabaseStatus)
+		assert.Equal(t, wantConfigErrMsgForProdMode, got.ConfigurationStatus)
+	})
+
+	s.T().Run("service_unavailable_with_db_issue", func(t *testing.T) {
+		currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
+		defer os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
+
+		wantDevMode := true
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", strconv.FormatBool(wantDevMode))
+		svc, ctrl := s.UnSecuredControllerWithUnreachableDB()
+
+		_, got := test.ShowStatusServiceUnavailable(t, svc.Context, svc, ctrl)
+
+		assert.Equal(t, wantDevMode, *got.DevMode)
+		assert.Equal(t, "Error: DB is unreachable", got.DatabaseStatus)
+		assert.Equal(t, wantConfigErrMsgForDevMode, got.ConfigurationStatus)
+	})
+
+}
+
+func checkStatus(t *testing.T, got *app.Status) {
+	t.Helper()
+	assert.Equal(t, app.Commit, got.Commit)
+	assert.Equal(t, app.StartTime, got.StartTime)
+	_, err := time.Parse("2006-01-02T15:04:05Z", got.StartTime)
+	assert.Nil(t, err, "Incorrect layout of StartTime")
 }

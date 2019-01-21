@@ -46,3 +46,51 @@ func (s *ConfigurationTestSuite) TestAuthURL() {
 	require.NoError(s.T(), err)
 	assert.Equal(s.T(), "https://api.some.io", config.GetAuthServiceURL())
 }
+
+func (s *ConfigurationTestSuite) TestConfigErr() {
+	t := s.T()
+	currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
+	currPgPass := os.Getenv("F8_POSTGRES_PASSWORD")
+	currSentryDSN := os.Getenv("F8_SENTRY_DSN")
+	currAuthURL := os.Getenv("F8_AUTH_URL")
+	currClusterURL := os.Getenv("F8_CLUSTER_URL")
+	defer func() {
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
+		os.Setenv("F8_POSTGRES_PASSWORD", currPgPass)
+		os.Setenv("F8_SENTRY_DSN", currSentryDSN)
+		os.Setenv("F8_AUTH_URL", currAuthURL)
+		os.Setenv("F8_CLUSTER_URL", currClusterURL)
+	}()
+
+	os.Setenv("F8_DEVELOPER_MODE_ENABLED", "false")
+	os.Unsetenv("F8_AUTH_URL")
+	os.Unsetenv("F8_CLUSTER_URL")
+
+	configErr := createConfigAndGetConfigErr(t)
+	assert.Equal(t, "default DB password is used; Sentry DSN is empty; Auth service url is empty; Cluster service url is empty", configErr.Error())
+
+	os.Setenv("F8_POSTGRES_PASSWORD", "abcd1234")
+	configErr = createConfigAndGetConfigErr(t)
+	assert.Equal(t, "Sentry DSN is empty; Auth service url is empty; Cluster service url is empty", configErr.Error())
+
+	os.Setenv("F8_SENTRY_DSN", "https://somedsn.com")
+	configErr = createConfigAndGetConfigErr(t)
+	assert.Equal(t, "Auth service url is empty; Cluster service url is empty", configErr.Error())
+
+	os.Setenv("F8_AUTH_URL", "https://someauth.com")
+	configErr = createConfigAndGetConfigErr(t)
+	assert.Equal(t, "Cluster service url is empty", configErr.Error())
+
+	os.Unsetenv("F8_AUTH_URL")
+	os.Setenv("F8_CLUSTER_URL", "https://somecluster.com")
+	configErr = createConfigAndGetConfigErr(t)
+	assert.Equal(t, "Auth service url is empty", configErr.Error())
+}
+
+func createConfigAndGetConfigErr(t *testing.T) error {
+	config, err := configuration.New("")
+	require.NoError(t, err)
+	configErr := config.DefaultConfigError()
+	assert.NotNil(t, configErr)
+	return configErr
+}

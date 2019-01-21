@@ -120,7 +120,7 @@ func main() {
 	// ---
 
 	// Mount controllers
-	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db)))
+	app.MountStatusController(service, controller.NewStatusController(service, controller.NewGormDBChecker(db), config))
 	app.MountEnvironmentController(service, controller.NewEnvironmentController(service, appDB, authService, clusterService))
 	// ---
 

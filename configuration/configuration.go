@@ -2,28 +2,17 @@ package configuration
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	commonconfig "github.com/fabric8-services/fabric8-common/configuration"
-	errs "github.com/pkg/errors"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	yaml "gopkg.in/yaml.v2"
 )
-
-func (c *Registry) String() string {
-	allSettings := c.v.AllSettings()
-	y, err := yaml.Marshal(&allSettings)
-	if err != nil {
-		log.WithFields(map[string]interface{}{
-			"settings": allSettings,
-			"err":      err,
-		}).Panicln("Failed to marshall config to string")
-	}
-	return fmt.Sprintf("%s\n", y)
-}
 
 const (
 	varLogLevel                            = "log.level"
@@ -56,11 +45,12 @@ const (
 )
 
 type Registry struct {
-	v *viper.Viper
+	v                  *viper.Viper
+	defaultConfigError error
 }
 
 func New(configFilePath string) (*Registry, error) {
-	c := Registry{
+	c := &Registry{
 		v: viper.New(),
 	}
 	c.v.SetEnvPrefix("F8")
@@ -74,19 +64,41 @@ func New(configFilePath string) (*Registry, error) {
 		c.v.SetConfigFile(configFilePath)
 		err := c.v.ReadInConfig()
 		if err != nil {
-			return nil, errs.Errorf("Fatal error config file: %s \n", err)
+			return nil, errors.Errorf("Fatal error config file: %s \n", err)
 		}
 	}
-	return &c, nil
+
+	if c.DeveloperModeEnabled() {
+		c.appendDefaultConfigErrorMessage("developer Mode is enabled")
+	}
+	if c.GetPostgresPassword() == defaultDBPassword {
+		c.appendDefaultConfigErrorMessage("default DB password is used")
+	}
+	if c.GetSentryDSN() == "" {
+		c.appendDefaultConfigErrorMessage("Sentry DSN is empty")
+	}
+	c.validateURL(c.GetAuthServiceURL(), "Auth service")
+	c.validateURL(c.GetClusterServiceURL(), "Cluster service")
+
+	if c.defaultConfigError != nil {
+		log.WithFields(map[string]interface{}{
+			"default_config_error": c.defaultConfigError.Error(),
+		}).Warningln("Default config is used! This is OK in Dev Mode.")
+	}
+
+	return c, nil
 }
 
-func getConfigFilePath() string {
-	// This was either passed as a env var Or, set inside main.go from --config
-	envConfigPath, ok := os.LookupEnv("F8_CONFIG_FILE_PATH")
-	if !ok {
-		return ""
+func (c *Registry) String() string {
+	allSettings := c.v.AllSettings()
+	y, err := yaml.Marshal(&allSettings)
+	if err != nil {
+		log.WithFields(map[string]interface{}{
+			"settings": allSettings,
+			"err":      err,
+		}).Panicln("Failed to marshall config to string")
 	}
-	return envConfigPath
+	return fmt.Sprintf("%s\n", y)
 }
 
 // Get is a wrapper over New() which reads configuration file path from the environment variable.
@@ -115,6 +127,34 @@ func (c *Registry) setConfigDefaults() {
 	c.v.SetDefault(varPostgresConnectionMaxOpen, -1)
 	c.v.SetDefault(varPostgresTransactionTimeout, time.Duration(5*time.Minute))
 	c.v.SetDefault(varPostgresConnectionRetrySleep, time.Duration(time.Second))
+}
+
+func (c *Registry) appendDefaultConfigErrorMessage(message string) {
+	if c.defaultConfigError == nil {
+		c.defaultConfigError = errors.New(message)
+	} else {
+		c.defaultConfigError = errors.Errorf("%s; %s", c.defaultConfigError.Error(), message)
+	}
+}
+
+func (c *Registry) validateURL(serviceURL, serviceName string) {
+	if serviceURL == "" {
+		c.appendDefaultConfigErrorMessage(fmt.Sprintf("%s url is empty", serviceName))
+	} else {
+		_, err := url.Parse(serviceURL)
+		if err != nil {
+			c.appendDefaultConfigErrorMessage(fmt.Sprintf("invalid %s url: %s", serviceName, err.Error()))
+		}
+	}
+}
+
+func getConfigFilePath() string {
+	// This was either passed as a env var Or, set inside main.go from --config
+	envConfigPath, ok := os.LookupEnv("F8_CONFIG_FILE_PATH")
+	if !ok {
+		return ""
+	}
+	return envConfigPath
 }
 
 func (c *Registry) GetLogLevel() string {
@@ -265,4 +305,8 @@ func (c *Registry) IsCleanTestDataErrorReportingRequired() bool {
 
 func (c *Registry) IsDBLogsEnabled() bool {
 	return c.v.GetBool(varDBLogsEnabled)
+}
+
+func (c *Registry) DefaultConfigError() error {
+	return c.defaultConfigError
 }
