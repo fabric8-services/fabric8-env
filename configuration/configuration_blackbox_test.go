@@ -66,28 +66,28 @@ func (s *ConfigurationTestSuite) TestConfigErr() {
 	os.Unsetenv("F8_AUTH_URL")
 	os.Unsetenv("F8_CLUSTER_URL")
 
-	configErr := createConfigGetConfigErr(t)
+	configErr := createConfigAndGetConfigErr(t)
 	assert.Equal(t, "default DB password is used; Sentry DSN is empty; Auth service url is empty; Cluster service url is empty", configErr.Error())
 
 	os.Setenv("F8_POSTGRES_PASSWORD", "abcd1234")
-	configErr = createConfigGetConfigErr(t)
+	configErr = createConfigAndGetConfigErr(t)
 	assert.Equal(t, "Sentry DSN is empty; Auth service url is empty; Cluster service url is empty", configErr.Error())
 
 	os.Setenv("F8_SENTRY_DSN", "https://somedsn.com")
-	configErr = createConfigGetConfigErr(t)
+	configErr = createConfigAndGetConfigErr(t)
 	assert.Equal(t, "Auth service url is empty; Cluster service url is empty", configErr.Error())
 
 	os.Setenv("F8_AUTH_URL", "https://someauth.com")
-	configErr = createConfigGetConfigErr(t)
+	configErr = createConfigAndGetConfigErr(t)
 	assert.Equal(t, "Cluster service url is empty", configErr.Error())
 
 	os.Unsetenv("F8_AUTH_URL")
 	os.Setenv("F8_CLUSTER_URL", "https://somecluster.com")
-	configErr = createConfigGetConfigErr(t)
+	configErr = createConfigAndGetConfigErr(t)
 	assert.Equal(t, "Auth service url is empty", configErr.Error())
 }
 
-func createConfigGetConfigErr(t *testing.T) error {
+func createConfigAndGetConfigErr(t *testing.T) error {
 	config, err := configuration.New("")
 	require.NoError(t, err)
 	configErr := config.DefaultConfigError()
