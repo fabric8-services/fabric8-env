@@ -49,16 +49,22 @@ func (s *ConfigurationTestSuite) TestAuthURL() {
 
 func (s *ConfigurationTestSuite) TestConfigErr() {
 	t := s.T()
+	currDevMode := os.Getenv("F8_DEVELOPER_MODE_ENABLED")
 	currPgPass := os.Getenv("F8_POSTGRES_PASSWORD")
 	currSentryDSN := os.Getenv("F8_SENTRY_DSN")
 	currAuthURL := os.Getenv("F8_AUTH_URL")
 	currClusterURL := os.Getenv("F8_CLUSTER_URL")
 	defer func() {
+		os.Setenv("F8_DEVELOPER_MODE_ENABLED", currDevMode)
 		os.Setenv("F8_POSTGRES_PASSWORD", currPgPass)
 		os.Setenv("F8_SENTRY_DSN", currSentryDSN)
 		os.Setenv("F8_AUTH_URL", currAuthURL)
 		os.Setenv("F8_CLUSTER_URL", currClusterURL)
 	}()
+
+	os.Setenv("F8_DEVELOPER_MODE_ENABLED", "false")
+	os.Unsetenv("F8_AUTH_URL")
+	os.Unsetenv("F8_CLUSTER_URL")
 
 	configErr := createConfigGetConfigErr(t)
 	assert.Equal(t, "default DB password is used; Sentry DSN is empty; Auth service url is empty; Cluster service url is empty", configErr.Error())
