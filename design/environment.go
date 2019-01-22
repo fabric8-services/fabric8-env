@@ -25,7 +25,7 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 		a.Example("myapp-stage")
 	})
 	a.Attribute("type", d.String, "The environment type", func() {
-		a.Example("stage")
+		a.Enum("dev", "build", "stage", "run")
 	})
 	a.Attribute("namespaceName", d.String, "The namespace name", func() {
 		a.Example("myapp-stage")
