@@ -13,6 +13,7 @@ import (
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-env/app"
+	"github.com/fabric8-services/fabric8-env/app/test"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
