@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	clusterclient "github.com/fabric8-services/fabric8-cluster-client/cluster"
+	"github.com/fabric8-services/fabric8-common/convert/ptr"
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-env/app"
-	"github.com/fabric8-services/fabric8-env/app/test"
 	"github.com/fabric8-services/fabric8-env/configuration"
 	"github.com/fabric8-services/fabric8-env/controller"
 	"github.com/fabric8-services/fabric8-env/gormapp"
@@ -119,6 +119,76 @@ func (s *EnvironmentControllerSuite) TestShow() {
 		envID := uuid.NewV4()
 		_, err := test.ShowEnvironmentNotFound(t, s.ctx, s.svc, s.ctrl, envID)
 		assert.NotNil(t, err)
+	})
+}
+
+func (s *EnvironmentControllerSuite) TestValidate() {
+	s.T().Run("ok", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					Type:          "stage",
+					ClusterURL:    ptr.String("cluster1.com"),
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.NoError(t, err)
+	})
+
+	s.T().Run("missing_name_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Type:          "stage",
+					ClusterURL:    ptr.String("cluster1.com"),
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("missing_type_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					ClusterURL:    ptr.String("cluster1.com"),
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("wrong_type_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					Type:          "STAGE",
+					ClusterURL:    ptr.String("cluster1.com"),
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
 	})
 }
 
