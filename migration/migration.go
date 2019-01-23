@@ -16,6 +16,7 @@ func Steps() Scripts {
 	return [][]string{
 		{"000-bootstrap.sql"},
 		{"001-environments.sql"},
+		{"0002-alter-env-add-notnull.sql"},
 	}
 }
 

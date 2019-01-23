@@ -70,27 +70,46 @@ func (s *MigrationTestSuite) SetupTest() {
 }
 
 func (s *MigrationTestSuite) TestMigrate() {
+	t := s.T()
 	dbConfig := fmt.Sprintf("host=%s port=%s user=postgres password=mysecretpassword dbname=%s sslmode=disable connect_timeout=5",
 		host, port, dbName)
 	var err error
 	sqlDB, err = sql.Open("postgres", dbConfig)
-	require.NoError(s.T(), err, "cannot connect to DB '%s'", dbName)
+	require.NoError(t, err, "cannot connect to DB '%s'", dbName)
 	defer sqlDB.Close()
 
 	gormDB, err := gorm.Open("postgres", dbConfig)
-	require.NoError(s.T(), err, "cannot connect to DB '%s'", dbName)
+	require.NoError(t, err, "cannot connect to DB '%s'", dbName)
 	defer gormDB.Close()
 
-	s.T().Run("checkMigration001", checkMigration001)
+	t.Run("checkMigration001", checkMigration001)
+	t.Run("checkMigration002", checkMigration002)
 }
 
 func checkMigration001(t *testing.T) {
 	err := migrationsupport.Migrate(sqlDB, databaseName, migration.Steps()[:2])
 	require.NoError(t, err)
 
-	t.Run("insert ok", func(t *testing.T) {
+	t.Run("insert_ok", func(t *testing.T) {
 		_, err := sqlDB.Exec(`INSERT INTO environments (id, name, type, space_id, namespace_name, cluster_url)
-			VALUES (uuid_generate_v4(),'osio-stage', 'stage', uuid_generate_v4(),'', 'cluster1.com')`)
+			VALUES (uuid_generate_v4(), 'osio-stage', 'stage', uuid_generate_v4(), '', 'cluster1.com')`)
 		require.NoError(t, err)
+	})
+}
+
+func checkMigration002(t *testing.T) {
+	err := migrationsupport.Migrate(sqlDB, databaseName, migration.Steps()[:3])
+	require.NoError(t, err)
+
+	t.Run("insert_ok", func(t *testing.T) {
+		_, err := sqlDB.Exec(`INSERT INTO environments (id, name, type, space_id, namespace_name, cluster_url)
+			VALUES (uuid_generate_v4(), 'osio-stage', 'stage', uuid_generate_v4(), '', 'cluster1.com')`)
+		require.NoError(t, err)
+	})
+
+	t.Run("insert_null_failed", func(t *testing.T) {
+		_, err := sqlDB.Exec(`INSERT INTO environments (id, space_id, namespace_name, cluster_url)
+			VALUES (uuid_generate_v4(), uuid_generate_v4(), '', 'cluster1.com')`)
+		require.Error(t, err)
 	})
 }

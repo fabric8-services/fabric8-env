@@ -126,8 +126,8 @@ func newCreateEnvironmentPayload(name, envType, clusterURL string) *app.CreateEn
 	payload := &app.CreateEnvironmentPayload{
 		Data: &app.Environment{
 			Attributes: &app.EnvironmentAttributes{
-				Name:       &name,
-				Type:       &envType,
+				Name:       name,
+				Type:       envType,
 				ClusterURL: &clusterURL,
 			},
 			Type: "environments",

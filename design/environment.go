@@ -14,7 +14,6 @@ var env = a.Type("Environment", func() {
 		a.Example("40bbdd3d-8b5d-4fd6-ac90-7236b669af04")
 	})
 	a.Attribute("attributes", envAttrs)
-	// a.Attribute("relationships", envRelationships)
 	a.Attribute("links", genericLinks)
 	a.Required("type", "attributes")
 })
@@ -33,6 +32,7 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	a.Attribute("cluster-url", d.String, "The cluster url", func() {
 		a.Example("https://api.starter-us-east-2a.openshift.com")
 	})
+	a.Required("name", "type")
 })
 
 // var envRelationships = a.Type("EnvironmentRelations", func() {
