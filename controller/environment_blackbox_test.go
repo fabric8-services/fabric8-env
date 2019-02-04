@@ -125,19 +125,29 @@ func (s *EnvironmentControllerSuite) TestShow() {
 
 func (s *EnvironmentControllerSuite) TestValidate() {
 	s.T().Run("ok", func(t *testing.T) {
-		env := app.CreateEnvironmentPayload{
-			Data: &app.Environment{
-				Type: "environments",
-				Attributes: &app.EnvironmentAttributes{
-					Name:          "osio-stage",
-					Type:          "stage",
-					ClusterURL:    "cluster1.com",
-					NamespaceName: ptr.String("osio-stage"),
-				},
-			},
+		tables := []struct {
+			name, envType string
+		}{
+			{"che-dev", "dev"},
+			{"jenkins-build", "build"},
+			{"osio-stage", "stage"},
+			{"osio-run", "run"},
 		}
-		err := env.Validate()
-		assert.NoError(t, err)
+		for _, table := range tables {
+			env := app.CreateEnvironmentPayload{
+				Data: &app.Environment{
+					Type: "environments",
+					Attributes: &app.EnvironmentAttributes{
+						Name:          table.name,
+						Type:          table.envType,
+						ClusterURL:    "cluster1.com",
+						NamespaceName: ptr.String("osio-stage"),
+					},
+				},
+			}
+			err := env.Validate()
+			assert.NoError(t, err)
+		}
 	})
 
 	s.T().Run("missing_name_failed", func(t *testing.T) {
