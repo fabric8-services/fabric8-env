@@ -44,7 +44,7 @@ func ConvertEnvironment(env *environment.Environment) *app.Environment {
 			Name:          *env.Name,
 			Type:          *env.Type,
 			NamespaceName: env.NamespaceName,
-			ClusterURL:    env.ClusterURL,
+			ClusterURL:    *env.ClusterURL,
 		},
 	}
 	return respEnv
@@ -70,7 +70,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		return app.JSONErrorResponse(ctx, err)
 	}
 
-	err = c.checkClustersUser(ctx, *reqEnv.Attributes.ClusterURL)
+	err = c.checkClustersUser(ctx, reqEnv.Attributes.ClusterURL)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -82,7 +82,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 			Type:          &reqEnv.Attributes.Type,
 			SpaceID:       &spaceID,
 			NamespaceName: reqEnv.Attributes.NamespaceName,
-			ClusterURL:    reqEnv.Attributes.ClusterURL,
+			ClusterURL:    &reqEnv.Attributes.ClusterURL,
 		}
 
 		env, err = appl.Environments().Create(ctx, &newEnv)

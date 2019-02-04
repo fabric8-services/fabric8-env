@@ -1,2 +1,3 @@
 ALTER TABLE environments ALTER COLUMN name SET NOT NULL;
 ALTER TABLE environments ALTER COLUMN type SET NOT NULL;
+ALTER TABLE environments ALTER COLUMN cluster_url SET NOT NULL;

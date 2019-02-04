@@ -32,7 +32,7 @@ var envAttrs = a.Type("EnvironmentAttributes", func() {
 	a.Attribute("cluster-url", d.String, "The cluster url", func() {
 		a.Example("https://api.starter-us-east-2a.openshift.com")
 	})
-	a.Required("name", "type")
+	a.Required("name", "type", "cluster-url")
 })
 
 // var envRelationships = a.Type("EnvironmentRelations", func() {

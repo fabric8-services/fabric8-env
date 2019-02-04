@@ -131,7 +131,7 @@ func (s *EnvironmentControllerSuite) TestValidate() {
 				Attributes: &app.EnvironmentAttributes{
 					Name:          "osio-stage",
 					Type:          "stage",
-					ClusterURL:    ptr.String("cluster1.com"),
+					ClusterURL:    "cluster1.com",
 					NamespaceName: ptr.String("osio-stage"),
 				},
 			},
@@ -146,7 +146,7 @@ func (s *EnvironmentControllerSuite) TestValidate() {
 				Type: "environments",
 				Attributes: &app.EnvironmentAttributes{
 					Type:          "stage",
-					ClusterURL:    ptr.String("cluster1.com"),
+					ClusterURL:    "cluster1.com",
 					NamespaceName: ptr.String("osio-stage"),
 				},
 			},
@@ -163,7 +163,24 @@ func (s *EnvironmentControllerSuite) TestValidate() {
 				Type: "environments",
 				Attributes: &app.EnvironmentAttributes{
 					Name:          "osio-stage",
-					ClusterURL:    ptr.String("cluster1.com"),
+					ClusterURL:    "cluster1.com",
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("missing_cluster_url_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					Type:          "stage",
 					NamespaceName: ptr.String("osio-stage"),
 				},
 			},
@@ -181,7 +198,7 @@ func (s *EnvironmentControllerSuite) TestValidate() {
 				Attributes: &app.EnvironmentAttributes{
 					Name:          "osio-stage",
 					Type:          "STAGE",
-					ClusterURL:    ptr.String("cluster1.com"),
+					ClusterURL:    "cluster1.com",
 					NamespaceName: ptr.String("osio-stage"),
 				},
 			},
@@ -199,7 +216,7 @@ func newCreateEnvironmentPayload(name, envType, clusterURL string) *app.CreateEn
 			Attributes: &app.EnvironmentAttributes{
 				Name:       name,
 				Type:       envType,
-				ClusterURL: &clusterURL,
+				ClusterURL: clusterURL,
 			},
 			Type: "environments",
 		},

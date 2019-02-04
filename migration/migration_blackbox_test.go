@@ -107,9 +107,15 @@ func checkMigration002(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("insert_null_failed", func(t *testing.T) {
+	t.Run("insert_null_failed1", func(t *testing.T) {
 		_, err := sqlDB.Exec(`INSERT INTO environments (id, space_id, namespace_name, cluster_url)
 			VALUES (uuid_generate_v4(), uuid_generate_v4(), '', 'cluster1.com')`)
+		require.Error(t, err)
+	})
+
+	t.Run("insert_null_failed2", func(t *testing.T) {
+		_, err := sqlDB.Exec(`INSERT INTO environments (id, name, type, space_id, namespace_name)
+			VALUES (uuid_generate_v4(), 'osio-stage', 'stage', uuid_generate_v4(), '')`)
 		require.Error(t, err)
 	})
 }
