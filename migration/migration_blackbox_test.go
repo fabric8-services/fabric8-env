@@ -98,13 +98,11 @@ func checkMigration001(t *testing.T) {
 }
 
 func checkMigration002(t *testing.T) {
-	t.Run("insert_null_ok", func(t *testing.T) {
-		_, err := sqlDB.Exec(`INSERT INTO environments (id, space_id, namespace_name)
+	_, err := sqlDB.Exec(`INSERT INTO environments (id, space_id, namespace_name)
 			VALUES (uuid_generate_v4(), uuid_generate_v4(), '')`)
-		require.NoError(t, err)
-	})
+	require.NoError(t, err)
 
-	err := migrationsupport.Migrate(sqlDB, databaseName, migration.Steps()[:3])
+	err = migrationsupport.Migrate(sqlDB, databaseName, migration.Steps()[:3])
 	require.NoError(t, err)
 
 	t.Run("insert_ok", func(t *testing.T) {
