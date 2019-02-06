@@ -41,12 +41,11 @@ func ConvertEnvironment(env *environment.Environment) *app.Environment {
 		ID:   env.ID,
 		Type: APIStringTypeEnvironment,
 		Attributes: &app.EnvironmentAttributes{
-			Name:          env.Name,
-			Type:          env.Type,
+			Name:          *env.Name,
+			Type:          *env.Type,
 			NamespaceName: env.NamespaceName,
-			ClusterURL:    env.ClusterURL,
+			ClusterURL:    *env.ClusterURL,
 		},
-		// TODO add links, relations
 	}
 	return respEnv
 }
@@ -71,7 +70,7 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 		return app.JSONErrorResponse(ctx, err)
 	}
 
-	err = c.checkClustersUser(ctx, *reqEnv.Attributes.ClusterURL)
+	err = c.checkClustersUser(ctx, reqEnv.Attributes.ClusterURL)
 	if err != nil {
 		return app.JSONErrorResponse(ctx, err)
 	}
@@ -79,11 +78,11 @@ func (c *EnvironmentController) Create(ctx *app.CreateEnvironmentContext) error 
 	var env *environment.Environment
 	err = application.Transactional(c.db, func(appl application.Application) error {
 		newEnv := environment.Environment{
-			Name:          reqEnv.Attributes.Name,
-			Type:          reqEnv.Attributes.Type,
+			Name:          &reqEnv.Attributes.Name,
+			Type:          &reqEnv.Attributes.Type,
 			SpaceID:       &spaceID,
 			NamespaceName: reqEnv.Attributes.NamespaceName,
-			ClusterURL:    reqEnv.Attributes.ClusterURL,
+			ClusterURL:    &reqEnv.Attributes.ClusterURL,
 		}
 
 		env, err = appl.Environments().Create(ctx, &newEnv)

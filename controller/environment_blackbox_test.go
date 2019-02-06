@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	clusterclient "github.com/fabric8-services/fabric8-cluster-client/cluster"
+	"github.com/fabric8-services/fabric8-common/convert/ptr"
 	testauth "github.com/fabric8-services/fabric8-common/test/auth"
 	testsuite "github.com/fabric8-services/fabric8-common/test/suite"
 	"github.com/fabric8-services/fabric8-env/app"
@@ -122,13 +123,110 @@ func (s *EnvironmentControllerSuite) TestShow() {
 	})
 }
 
+func (s *EnvironmentControllerSuite) TestValidate() {
+	s.T().Run("ok", func(t *testing.T) {
+		tables := []struct {
+			name, envType string
+		}{
+			{"che-dev", "dev"},
+			{"jenkins-build", "build"},
+			{"osio-stage", "stage"},
+			{"osio-run", "run"},
+		}
+		for _, table := range tables {
+			env := app.CreateEnvironmentPayload{
+				Data: &app.Environment{
+					Type: "environments",
+					Attributes: &app.EnvironmentAttributes{
+						Name:          table.name,
+						Type:          table.envType,
+						ClusterURL:    "cluster1.com",
+						NamespaceName: ptr.String("osio-stage"),
+					},
+				},
+			}
+			err := env.Validate()
+			assert.NoError(t, err)
+		}
+	})
+
+	s.T().Run("missing_name_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Type:          "stage",
+					ClusterURL:    "cluster1.com",
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("missing_type_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					ClusterURL:    "cluster1.com",
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("missing_cluster_url_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					Type:          "stage",
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+
+	s.T().Run("wrong_type_failed", func(t *testing.T) {
+		env := app.CreateEnvironmentPayload{
+			Data: &app.Environment{
+				Type: "environments",
+				Attributes: &app.EnvironmentAttributes{
+					Name:          "osio-stage",
+					Type:          "STAGE",
+					ClusterURL:    "cluster1.com",
+					NamespaceName: ptr.String("osio-stage"),
+				},
+			},
+		}
+		err := env.Validate()
+		assert.Error(t, err)
+		cause := err.(*goa.ErrorResponse)
+		assert.Equal(t, 400, cause.Status)
+	})
+}
+
 func newCreateEnvironmentPayload(name, envType, clusterURL string) *app.CreateEnvironmentPayload {
 	payload := &app.CreateEnvironmentPayload{
 		Data: &app.Environment{
 			Attributes: &app.EnvironmentAttributes{
-				Name:       &name,
-				Type:       &envType,
-				ClusterURL: &clusterURL,
+				Name:       name,
+				Type:       envType,
+				ClusterURL: clusterURL,
 			},
 			Type: "environments",
 		},
